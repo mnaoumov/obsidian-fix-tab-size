@@ -1,0 +1,12 @@
+{
+  "author": "mnaoumov",
+  "authorUrl": "https://github.com/mnaoumov/",
+  "description": "Fixes tab size according to the settings.",
+
+  "fundingUrl": "https://www.buymeacoffee.com/mnaoumov",
+
+  "id": "fix-tab-size",
+  "isDesktopOnly": true,
+  "name": "Fix Tab Size",
+  "version": "0.0.0"
+}
