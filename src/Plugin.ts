@@ -7,6 +7,7 @@ import {
 import { getPrototypeOf } from 'obsidian-dev-utils/ObjectUtils';
 import { registerPatch } from 'obsidian-dev-utils/obsidian/MonkeyAround';
 import { PluginBase } from 'obsidian-dev-utils/obsidian/Plugin/PluginBase';
+import { ViewType } from 'obsidian-typings/implementations';
 
 import type { PluginTypes } from './PluginTypes.ts';
 
@@ -32,11 +33,8 @@ export class Plugin extends PluginBase<PluginTypes> {
   protected override async onloadImpl(): Promise<void> {
     await super.onloadImpl();
 
-    const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (markdownView) {
-      this.patch(markdownView);
-    }
-    this.registerEvent(this.app.workspace.on('layout-change', this.handleLayoutChange.bind(this)));
+    this.patchDynamicExtensions();
+    this.registerEvent(this.app.workspace.on('layout-change', this.patchDynamicExtensions.bind(this)));
   }
 
   private getDynamicExtensions(next: GetDynamicExtensionsFn, markdownEditView: MarkdownEditView): Extension[] {
@@ -58,23 +56,20 @@ export class Plugin extends PluginBase<PluginTypes> {
     return extensions;
   }
 
-  private handleLayoutChange(): void {
+  private patchDynamicExtensions(): void {
     if (this.isPatched) {
       return;
     }
 
-    const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (!markdownView) {
+    const markdownViews = this.app.workspace.getLeavesOfType(ViewType.Markdown).flatMap((leaf) => leaf.view instanceof MarkdownView ? [leaf.view] : []);
+
+    if (markdownViews.length === 0 || !markdownViews[0]) {
       return;
     }
 
-    this.patch(markdownView);
-  }
-
-  private patch(markdownView: MarkdownView): void {
     this.isPatched = true;
 
-    const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownView.editMode)));
+    const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownViews[0].editMode)));
     const that = this;
     registerPatch(this, proto, {
       getDynamicExtensions: (next: GetDynamicExtensionsFn): GetDynamicExtensionsFn => {
@@ -83,5 +78,9 @@ export class Plugin extends PluginBase<PluginTypes> {
         };
       }
     });
+
+    for (const markdownView of markdownViews) {
+      markdownView.editMode.updateOptions();
+    }
   }
 }
