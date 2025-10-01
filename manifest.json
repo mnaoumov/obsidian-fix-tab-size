@@ -4,7 +4,7 @@
   "description": "Fixes tab size according to the settings.",
   "fundingUrl": "https://www.buymeacoffee.com/mnaoumov",
   "id": "fix-tab-size",
-  "isDesktopOnly": true,
+  "isDesktopOnly": false,
   "name": "Fix Tab Size",
   "version": "0.0.0"
 }
