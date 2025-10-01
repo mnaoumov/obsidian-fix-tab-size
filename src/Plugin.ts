@@ -32,7 +32,11 @@ export class Plugin extends PluginBase<PluginTypes> {
   protected override async onloadImpl(): Promise<void> {
     await super.onloadImpl();
 
-    this.registerEvent(this.app.workspace.on('file-open', this.handleFileOpen.bind(this)));
+    const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (markdownView) {
+      this.patch(markdownView);
+    }
+    this.registerEvent(this.app.workspace.on('layout-change', this.handleLayoutChange.bind(this)));
   }
 
   private getDynamicExtensions(next: GetDynamicExtensionsFn, markdownEditView: MarkdownEditView): Extension[] {
@@ -54,7 +58,7 @@ export class Plugin extends PluginBase<PluginTypes> {
     return extensions;
   }
 
-  private handleFileOpen(): void {
+  private handleLayoutChange(): void {
     if (this.isPatched) {
       return;
     }
@@ -64,6 +68,10 @@ export class Plugin extends PluginBase<PluginTypes> {
       return;
     }
 
+    this.patch(markdownView);
+  }
+
+  private patch(markdownView: MarkdownView): void {
     this.isPatched = true;
 
     const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownView.editMode)));
