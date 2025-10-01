@@ -6,6 +6,6 @@
   "id": "fix-tab-size",
   "isDesktopOnly": false,
   "name": "Fix Tab Size",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "1.9.12"
 }
