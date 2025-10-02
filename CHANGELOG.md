@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.2.1
+
+- fix: build
+- chore: update libs
+
 ## 1.2.0
 
 - feat: update tab size for open views
