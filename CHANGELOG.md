@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.3
+
+- chore: cleanup unused
+
 ## 1.2.2
 
 - chore: update libs
