@@ -4,9 +4,9 @@ import {
   MarkdownEditView,
   MarkdownView
 } from 'obsidian';
-import { getPrototypeOf } from 'obsidian-dev-utils/ObjectUtils';
-import { registerPatch } from 'obsidian-dev-utils/obsidian/MonkeyAround';
-import { PluginBase } from 'obsidian-dev-utils/obsidian/Plugin/PluginBase';
+import { getPrototypeOf } from 'obsidian-dev-utils/object-utils';
+import { registerPatch } from 'obsidian-dev-utils/obsidian/monkey-around';
+import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin-base';
 import { ViewType } from 'obsidian-typings/implementations';
 
 import type { PluginTypes } from './PluginTypes.ts';
