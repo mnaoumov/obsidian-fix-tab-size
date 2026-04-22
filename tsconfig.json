@@ -8,7 +8,6 @@
     "importHelpers": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "jsx": "react-jsx",
     "lib": [
       "DOM",
       "ES2024"
@@ -22,15 +21,15 @@
     "types": [
       "@total-typescript/ts-reset",
       "node",
-      "svelte"
+      "obsidian-typings"
     ],
     "verbatimModuleSyntax": true
   },
   "include": [
-    "./.markdownlint-cli2.mts",
     "./commitlint.config.ts",
     "./eslint.config.mts",
     "./src/**/*.ts",
-    "./scripts/**/*.ts"
+    "./scripts/**/*.ts",
+    "./vitest.config.ts"
   ]
 }

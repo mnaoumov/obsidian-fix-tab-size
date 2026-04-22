@@ -21,6 +21,9 @@
     "lint:md:fix": "jiti scripts/lint-md-fix.ts",
     "prepare": "jiti scripts/prepare.ts",
     "spellcheck": "jiti scripts/spellcheck.ts",
+    "test": "jiti scripts/test.ts",
+    "test:coverage": "jiti scripts/test-coverage.ts",
+    "test:watch": "jiti scripts/test-watch.ts",
     "version": "jiti scripts/version.ts"
   },
   "devDependencies": {
@@ -29,6 +32,7 @@
     "@commitlint/types": "latest",
     "@total-typescript/ts-reset": "latest",
     "@tsconfig/strictest": "latest",
+    "@vitest/coverage-v8": "latest",
     "better-typescript-lib": "latest",
     "commitizen": "latest",
     "cz-conventional-changelog": "latest",
@@ -38,7 +42,8 @@
     "nano-staged": "latest",
     "obsidian": "latest",
     "obsidian-dev-utils": "latest",
-    "obsidian-typings": "obsidian-public-latest"
+    "obsidian-typings": "obsidian-public-latest",
+    "vitest": "latest"
   },
   "overrides": {
     "@antfu/utils": "9.2.0",

@@ -6,12 +6,8 @@ import {
 } from 'obsidian';
 import { getPrototypeOf } from 'obsidian-dev-utils/object-utils';
 import { registerPatch } from 'obsidian-dev-utils/obsidian/monkey-around';
-import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin-base';
+import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
 import { ViewType } from 'obsidian-typings/implementations';
-
-import type { PluginTypes } from './PluginTypes.ts';
-
-import { PluginSettingsManager } from './PluginSettingsManager.ts';
 
 type ExtensionWithValue = {
   value: string;
@@ -19,20 +15,11 @@ type ExtensionWithValue = {
 
 type GetDynamicExtensionsFn = MarkdownEditView['getDynamicExtensions'];
 
-export class Plugin extends PluginBase<PluginTypes> {
+export class Plugin extends PluginBase {
   private isPatched = false;
-
-  protected override createSettingsManager(): PluginSettingsManager {
-    return new PluginSettingsManager(this);
-  }
-
-  protected override createSettingsTab(): null {
-    return null;
-  }
 
   protected override async onloadImpl(): Promise<void> {
     await super.onloadImpl();
-
     this.patchDynamicExtensions();
     this.registerEvent(this.app.workspace.on('layout-change', this.patchDynamicExtensions.bind(this)));
   }
@@ -73,9 +60,11 @@ export class Plugin extends PluginBase<PluginTypes> {
     const that = this;
     registerPatch(this, proto, {
       getDynamicExtensions: (next: GetDynamicExtensionsFn): GetDynamicExtensionsFn => {
+        /* v8 ignore start -- Runtime-only callback executed inside Obsidian's patched method. */
         return function getDynamicExtensionsPatched(this: MarkdownEditView): Extension[] {
           return that.getDynamicExtensions(next, this);
         };
+        /* v8 ignore stop */
       }
     });
 
