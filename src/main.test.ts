@@ -22,7 +22,7 @@ vi.mock('obsidian-dev-utils/obsidian/monkey-around', () => ({
   registerPatch: vi.fn()
 }));
 
-vi.mock('obsidian-typings/implementations', () => ({
+vi.mock('@obsidian-typings/obsidian-public-latest/implementations', () => ({
   ViewType: { Markdown: 'markdown' }
 }));
 

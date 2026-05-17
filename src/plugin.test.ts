@@ -1,5 +1,5 @@
 import type { Extension } from '@codemirror/state';
-import type { RegisterComponentParams } from 'obsidian-dev-utils/obsidian/plugin/plugin';
+import type { Component } from 'obsidian';
 
 import {
   afterEach,
@@ -52,7 +52,7 @@ const PluginBaseMock = vi.hoisted(() =>
     public consoleDebugComponent = { debug: vi.fn() };
     public manifest: unknown;
     private readonly eventHandlers: unknown[] = [];
-    private readonly registeredComponents: RegisterComponentParams[] = [];
+    private readonly addedChildren: Component[] = [];
 
     public constructor(app: unknown, manifest: unknown) {
       this.app = app;
@@ -63,9 +63,9 @@ const PluginBaseMock = vi.hoisted(() =>
       // Base implementation does nothing in mock.
     }
 
-    public registerComponent(params: RegisterComponentParams): unknown {
-      this.registeredComponents.push(params);
-      return params.component;
+    public addChild<T extends Component>(child: T): T {
+      this.addedChildren.push(child);
+      return child;
     }
 
     public registerEvent(ref: unknown): void {
@@ -86,7 +86,7 @@ vi.mock('obsidian-dev-utils/obsidian/monkey-around', () => ({
   registerPatch: vi.fn()
 }));
 
-vi.mock('obsidian-typings/implementations', () => ({
+vi.mock('@obsidian-typings/obsidian-public-latest/implementations', () => ({
   ViewType: {
     Markdown: 'markdown'
   }

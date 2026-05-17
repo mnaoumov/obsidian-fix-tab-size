@@ -7,7 +7,7 @@ import {
 import { getPrototypeOf } from 'obsidian-dev-utils/object-utils';
 import { registerPatch } from 'obsidian-dev-utils/obsidian/monkey-around';
 import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
-import { ViewType } from 'obsidian-typings/implementations';
+import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
 
 type ExtensionWithValue = {
   value: string;
