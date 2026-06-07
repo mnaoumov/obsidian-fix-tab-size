@@ -1,6 +1,10 @@
 import type { Extension } from '@codemirror/state';
-import type { Component } from 'obsidian';
+import type {
+  App,
+  PluginManifest
+} from 'obsidian';
 
+import { castTo } from 'obsidian-dev-utils/object-utils';
 import {
   afterEach,
   beforeEach,
@@ -14,17 +18,13 @@ interface ExtensionWithValue {
   value: string;
 }
 
-interface MockApp {
+interface MockAppShape {
   vault: MockVault;
   workspace: MockWorkspace;
 }
 
 interface MockEditMode {
   updateOptions: ReturnType<typeof vi.fn>;
-}
-
-interface MockLeaf {
-  view: MockMarkdownView;
 }
 
 interface MockMarkdownView {
@@ -40,51 +40,58 @@ interface MockWorkspace {
   on: ReturnType<typeof vi.fn>;
 }
 
+type PatchMap = Record<string, (next: (...args: unknown[]) => unknown) => (...args: unknown[]) => unknown>;
+
 interface PluginPrivateMethods {
-  getDynamicExtensions: (next: () => Extension[], markdownEditView: unknown) => Extension[];
+  getDynamicExtensions(next: () => Extension[], markdownEditView: unknown): Extension[];
   isPatched: boolean;
-  patchDynamicExtensions: () => void;
+  patchDynamicExtensions(): void;
 }
 
-const PluginBaseMock = vi.hoisted(() =>
-  class {
-    public app: unknown;
-    public consoleDebugComponent = { debug: vi.fn() };
-    public manifest: unknown;
-    private readonly eventHandlers: unknown[] = [];
-    private readonly addedChildren: Component[] = [];
+function noopFn(): void {
+  // Intentional no-op: default function when no original exists on the target.
+}
 
-    public constructor(app: unknown, manifest: unknown) {
+vi.mock('obsidian-dev-utils/obsidian/components/monkey-around-component', () => ({
+  MonkeyAroundComponent: class MockMonkeyAroundComponent {
+    public registerPatch(target: object, patches: PatchMap): void {
+      for (const [key, factory] of Object.entries(patches)) {
+        const original = (target as Record<string, (...args: unknown[]) => unknown>)[key] ?? noopFn;
+        (target as Record<string, unknown>)[key] = factory(original);
+      }
+    }
+  }
+}));
+
+vi.mock('obsidian-dev-utils/object-utils', () => ({
+  castTo: (value: unknown): unknown => value,
+  getPrototypeOf: vi.fn((obj: unknown) => Object.getPrototypeOf(obj as object))
+}));
+
+vi.mock('obsidian-dev-utils/obsidian/plugin/plugin', () => {
+  class MockPluginBase {
+    public app: App;
+    public manifest: PluginManifest;
+
+    public constructor(app: App, manifest: PluginManifest) {
       this.app = app;
       this.manifest = manifest;
     }
 
-    public async onloadImpl(): Promise<void> {
-      // Base implementation does nothing in mock.
-    }
-
-    public addChild<T extends Component>(child: T): T {
-      this.addedChildren.push(child);
+    public addChild<T>(child: T): T {
       return child;
     }
 
-    public registerEvent(ref: unknown): void {
-      this.eventHandlers.push(ref);
+    public register(): void {
+      // Noop
+    }
+
+    public registerEvent(): void {
+      // Noop
     }
   }
-);
-
-vi.mock('obsidian-dev-utils/obsidian/plugin/plugin', () => ({
-  PluginBase: PluginBaseMock
-}));
-
-vi.mock('obsidian-dev-utils/object-utils', () => ({
-  getPrototypeOf: vi.fn((obj: unknown) => Object.getPrototypeOf(obj as object))
-}));
-
-vi.mock('obsidian-dev-utils/obsidian/monkey-around', () => ({
-  registerPatch: vi.fn()
-}));
+  return { PluginBase: MockPluginBase };
+});
 
 vi.mock('@obsidian-typings/obsidian-public-latest/implementations', () => ({
   ViewType: {
@@ -115,8 +122,6 @@ vi.mock('obsidian', () => ({
 
 // eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede imports.
 import { MarkdownView } from 'obsidian';
-// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede imports.
-import { registerPatch } from 'obsidian-dev-utils/obsidian/monkey-around';
 
 // eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede imports.
 import { Plugin } from './plugin.ts';
@@ -126,16 +131,18 @@ function asPrivate(p: Plugin): PluginPrivateMethods {
   return p as unknown as PluginPrivateMethods;
 }
 
-function createMockApp(): MockApp {
-  return {
-    vault: {
-      getConfig: vi.fn()
-    },
-    workspace: {
-      getLeavesOfType: vi.fn().mockReturnValue([]),
-      on: vi.fn().mockReturnValue({ id: 'event-ref' })
-    }
+function createMockApp(): App {
+  const mockWorkspace: MockWorkspace = {
+    getLeavesOfType: vi.fn().mockReturnValue([]),
+    on: vi.fn().mockReturnValue({ id: 'event-ref' })
   };
+  const mockVault: MockVault = {
+    getConfig: vi.fn()
+  };
+  return castTo<App>({
+    vault: mockVault,
+    workspace: mockWorkspace
+  });
 }
 
 function createMockMarkdownView(): MockMarkdownView {
@@ -146,94 +153,100 @@ function createMockMarkdownView(): MockMarkdownView {
   return view as unknown as MockMarkdownView;
 }
 
+function getMockApp(app: App): MockAppShape {
+  // eslint-disable-next-line no-restricted-syntax -- castTo used to extract mock shape from App type.
+  return app as unknown as MockAppShape;
+}
+
 describe('Plugin', () => {
   let plugin: Plugin;
-  let mockApp: MockApp;
+  let mockApp: App;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockApp = createMockApp();
-    plugin = new Plugin(mockApp as never, { id: 'fix-tab-size' } as never);
+    plugin = new Plugin(mockApp, castTo<PluginManifest>({ id: 'fix-tab-size' }));
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('should extend PluginBase', () => {
-    expect(plugin).toBeInstanceOf(PluginBaseMock);
-  });
+  it('should register layout-change event on construction', () => {
+    const { workspace } = getMockApp(mockApp);
 
-  describe('onloadImpl', () => {
-    it('should call patchDynamicExtensions and register layout-change event', async () => {
-      const privateMethods = asPrivate(plugin);
-      const patchSpy = vi.spyOn(privateMethods, 'patchDynamicExtensions');
-
-      // eslint-disable-next-line no-restricted-syntax -- Calling protected method for testing needs double assertion.
-      await (plugin as unknown as { onloadImpl: () => Promise<void> }).onloadImpl();
-
-      expect(patchSpy).toHaveBeenCalled();
-      expect(mockApp.workspace.on).toHaveBeenCalledWith('layout-change', expect.any(Function));
-    });
+    expect(workspace.on).toHaveBeenCalledWith('layout-change', expect.any(Function));
   });
 
   describe('patchDynamicExtensions', () => {
     it('should return early if already patched', () => {
       asPrivate(plugin).isPatched = true;
+      const { workspace } = getMockApp(mockApp);
 
       asPrivate(plugin).patchDynamicExtensions();
 
-      expect(mockApp.workspace.getLeavesOfType).not.toHaveBeenCalled();
+      expect(workspace.getLeavesOfType).not.toHaveBeenCalled();
     });
 
     it('should return early if no markdown views exist', () => {
-      mockApp.workspace.getLeavesOfType.mockReturnValue([]);
+      const { workspace } = getMockApp(mockApp);
+      workspace.getLeavesOfType.mockReturnValue([]);
 
       asPrivate(plugin).patchDynamicExtensions();
 
-      expect(registerPatch).not.toHaveBeenCalled();
       expect(asPrivate(plugin).isPatched).toBe(false);
     });
 
     it('should return early if views are not MarkdownView instances', () => {
+      const { workspace } = getMockApp(mockApp);
       const nonMarkdownLeaf = { view: { editMode: { updateOptions: vi.fn() } } };
-      mockApp.workspace.getLeavesOfType.mockReturnValue([nonMarkdownLeaf]);
+      workspace.getLeavesOfType.mockReturnValue([nonMarkdownLeaf]);
 
       asPrivate(plugin).patchDynamicExtensions();
 
-      expect(registerPatch).not.toHaveBeenCalled();
       expect(asPrivate(plugin).isPatched).toBe(false);
     });
 
     it('should patch and update markdown views when available', () => {
+      const { workspace } = getMockApp(mockApp);
       const mockView = createMockMarkdownView();
-      const mockLeaf: MockLeaf = { view: mockView };
-      mockApp.workspace.getLeavesOfType.mockReturnValue([mockLeaf]);
+      workspace.getLeavesOfType.mockReturnValue([{ view: mockView }]);
 
       asPrivate(plugin).patchDynamicExtensions();
 
       expect(asPrivate(plugin).isPatched).toBe(true);
-      expect(registerPatch).toHaveBeenCalled();
       expect(mockView.editMode.updateOptions).toHaveBeenCalled();
     });
 
     it('should update all markdown views after patching', () => {
+      const { workspace } = getMockApp(mockApp);
       const mockView1 = createMockMarkdownView();
       const mockView2 = createMockMarkdownView();
-      const mockLeaf1: MockLeaf = { view: mockView1 };
-      const mockLeaf2: MockLeaf = { view: mockView2 };
-      mockApp.workspace.getLeavesOfType.mockReturnValue([mockLeaf1, mockLeaf2]);
+      workspace.getLeavesOfType.mockReturnValue([{ view: mockView1 }, { view: mockView2 }]);
 
       asPrivate(plugin).patchDynamicExtensions();
 
       expect(mockView1.editMode.updateOptions).toHaveBeenCalled();
       expect(mockView2.editMode.updateOptions).toHaveBeenCalled();
     });
+
+    it('should not re-patch if already patched on second call', () => {
+      const { workspace } = getMockApp(mockApp);
+      const mockView = createMockMarkdownView();
+      workspace.getLeavesOfType.mockReturnValue([{ view: mockView }]);
+
+      asPrivate(plugin).patchDynamicExtensions();
+      vi.clearAllMocks();
+      asPrivate(plugin).patchDynamicExtensions();
+
+      expect(workspace.getLeavesOfType).not.toHaveBeenCalled();
+    });
   });
 
   describe('getDynamicExtensions', () => {
     it('should pass through extensions when useTab is true', () => {
-      mockApp.vault.getConfig.mockImplementation((key: string) => {
+      const { vault } = getMockApp(mockApp);
+      vault.getConfig.mockImplementation((key: string) => {
         if (key === 'useTab') {
           return true;
         }
@@ -251,7 +264,8 @@ describe('Plugin', () => {
 
     it('should not modify extensions when tabSize equals hardcoded value of 4', () => {
       const HARDCODED_TAB_SIZE = 4;
-      mockApp.vault.getConfig.mockImplementation((key: string) => {
+      const { vault } = getMockApp(mockApp);
+      vault.getConfig.mockImplementation((key: string) => {
         if (key === 'useTab') {
           return false;
         }
@@ -274,7 +288,8 @@ describe('Plugin', () => {
 
     it('should replace tab size when useTab is false and tabSize differs from 4', () => {
       const TAB_SIZE = 2;
-      mockApp.vault.getConfig.mockImplementation((key: string) => {
+      const { vault } = getMockApp(mockApp);
+      vault.getConfig.mockImplementation((key: string) => {
         if (key === 'useTab') {
           return false;
         }
@@ -296,7 +311,8 @@ describe('Plugin', () => {
 
     it('should not modify extensions when no matching tab size extension is found', () => {
       const TAB_SIZE = 2;
-      mockApp.vault.getConfig.mockImplementation((key: string) => {
+      const { vault } = getMockApp(mockApp);
+      vault.getConfig.mockImplementation((key: string) => {
         if (key === 'useTab') {
           return false;
         }
@@ -318,7 +334,8 @@ describe('Plugin', () => {
 
     it('should handle extensions without value property', () => {
       const TAB_SIZE = 2;
-      mockApp.vault.getConfig.mockImplementation((key: string) => {
+      const { vault } = getMockApp(mockApp);
+      vault.getConfig.mockImplementation((key: string) => {
         if (key === 'useTab') {
           return false;
         }

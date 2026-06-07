@@ -9,17 +9,19 @@ vi.mock('obsidian-dev-utils/obsidian/plugin/plugin', () => ({
   PluginBase: vi.fn()
 }));
 
-vi.mock('obsidian', () => ({
-  MarkdownEditView: vi.fn(),
-  MarkdownView: vi.fn()
-}));
-
 vi.mock('obsidian-dev-utils/object-utils', () => ({
+  castTo: vi.fn(),
   getPrototypeOf: vi.fn()
 }));
 
-vi.mock('obsidian-dev-utils/obsidian/monkey-around', () => ({
-  registerPatch: vi.fn()
+vi.mock('obsidian-dev-utils/obsidian/components/monkey-around-component', () => ({
+  MonkeyAroundComponent: vi.fn()
+}));
+
+vi.mock('obsidian', () => ({
+  Component: vi.fn(),
+  MarkdownEditView: vi.fn(),
+  MarkdownView: vi.fn()
 }));
 
 vi.mock('@obsidian-typings/obsidian-public-latest/implementations', () => ({

@@ -1,13 +1,17 @@
 import type { Extension } from '@codemirror/state';
+import type {
+  App,
+  PluginManifest
+} from 'obsidian';
 
+import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
 import {
   MarkdownEditView,
   MarkdownView
 } from 'obsidian';
 import { getPrototypeOf } from 'obsidian-dev-utils/object-utils';
-import { registerPatch } from 'obsidian-dev-utils/obsidian/monkey-around';
+import { MonkeyAroundComponent } from 'obsidian-dev-utils/obsidian/components/monkey-around-component';
 import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
-import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
 
 type ExtensionWithValue = {
   value: string;
@@ -15,12 +19,15 @@ type ExtensionWithValue = {
 
 type GetDynamicExtensionsFn = MarkdownEditView['getDynamicExtensions'];
 
+const HARDCODED_TAB_SIZE = 4;
+
 export class Plugin extends PluginBase {
   private isPatched = false;
+  private readonly monkeyAroundComponent: MonkeyAroundComponent;
 
-  protected override async onloadImpl(): Promise<void> {
-    await super.onloadImpl();
-    this.patchDynamicExtensions();
+  public constructor(app: App, manifest: PluginManifest) {
+    super(app, manifest);
+    this.monkeyAroundComponent = this.addChild(new MonkeyAroundComponent());
     this.registerEvent(this.app.workspace.on('layout-change', this.patchDynamicExtensions.bind(this)));
   }
 
@@ -29,9 +36,10 @@ export class Plugin extends PluginBase {
 
     if (!this.app.vault.getConfig('useTab')) {
       const tabSize = this.app.vault.getConfig('tabSize') as number;
-      const HARDCODED_TAB_SIZE = 4;
       if (tabSize !== HARDCODED_TAB_SIZE) {
-        const tabSizeExtension = extensions.find((extension) => (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)) as
+        const tabSizeExtension = extensions.find((extension: Extension) =>
+          (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)
+        ) as
           | ExtensionWithValue
           | null;
         if (tabSizeExtension) {
@@ -58,14 +66,14 @@ export class Plugin extends PluginBase {
 
     const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownViews[0].editMode)));
     const that = this;
-    registerPatch(this, proto, {
+    this.monkeyAroundComponent.registerPatch(proto, {
+      /* v8 ignore start -- Runtime-only callback executed inside Obsidian's patched method. */
       getDynamicExtensions: (next: GetDynamicExtensionsFn): GetDynamicExtensionsFn => {
-        /* v8 ignore start -- Runtime-only callback executed inside Obsidian's patched method. */
         return function getDynamicExtensionsPatched(this: MarkdownEditView): Extension[] {
           return that.getDynamicExtensions(next, this);
         };
-        /* v8 ignore stop */
       }
+      /* v8 ignore stop */
     });
 
     for (const markdownView of markdownViews) {
