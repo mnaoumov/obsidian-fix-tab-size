@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.9
+
+- chore: update libs
+
 ## 1.2.8
 
 - chore: update libs
