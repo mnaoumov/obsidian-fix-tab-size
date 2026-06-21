@@ -1,4 +1,5 @@
 import type { Extension } from '@codemirror/state';
+
 import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
 import {
   MarkdownEditView,
@@ -19,10 +20,10 @@ const HARDCODED_TAB_SIZE = 4;
 
 export class Plugin extends PluginBase {
   private isPatched = false;
-  private monkeyAroundComponent!: MonkeyAroundComponent;
+  private readonly monkeyAroundComponent = new MonkeyAroundComponent();
 
- protected override onloadImpl(): void {
-    this.monkeyAroundComponent = this.addChild(new MonkeyAroundComponent());
+  protected override onloadImpl(): void {
+    this.addChild(this.monkeyAroundComponent);
     this.registerEvent(this.app.workspace.on('layout-change', this.patchDynamicExtensions.bind(this)));
   }
 
@@ -60,13 +61,11 @@ export class Plugin extends PluginBase {
     const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownViews[0].editMode)));
     const thisWrapper = ValueWrapper.of(this);
     this.monkeyAroundComponent.registerPatch(proto, {
-      /* v8 ignore start -- Runtime-only callback executed inside Obsidian's patched method. */
       getDynamicExtensions: (next: GetDynamicExtensionsFn): GetDynamicExtensionsFn => {
         return function getDynamicExtensionsPatched(this: MarkdownEditView): Extension[] {
           return thisWrapper.value.getDynamicExtensions(next, this);
         };
       }
-      /* v8 ignore stop */
     });
 
     for (const markdownView of markdownViews) {

@@ -1,10 +1,16 @@
 import type { Extension } from '@codemirror/state';
 import type {
-  App,
-  PluginManifest
+  App as AppOriginal,
+  MarkdownEditView,
+  PluginManifest,
+  WorkspaceLeaf
 } from 'obsidian';
 
 import { castTo } from 'obsidian-dev-utils/object-utils';
+import {
+  App,
+  MarkdownView
+} from 'obsidian-test-mocks/obsidian';
 import {
   afterEach,
   beforeEach,
@@ -14,344 +20,243 @@ import {
   vi
 } from 'vitest';
 
+interface EditModeContext {
+  editMode: MarkdownEditView;
+  nextExtensions: ExtensionsHolder;
+  updateOptions: ReturnType<typeof vi.fn>;
+}
+
+interface EditModeHolder {
+  editMode: MarkdownEditView;
+}
+
+interface ExtensionsHolder {
+  value: Extension[];
+}
+
 interface ExtensionWithValue {
   value: string;
 }
 
-interface MockAppShape {
-  vault: MockVault;
-  workspace: MockWorkspace;
-}
-
-interface MockEditMode {
-  updateOptions: ReturnType<typeof vi.fn>;
-}
-
-interface MockMarkdownView {
-  editMode: MockEditMode;
-}
-
-interface MockVault {
+interface GetConfigHolder {
   getConfig: ReturnType<typeof vi.fn>;
 }
 
-interface MockWorkspace {
-  getLeavesOfType: ReturnType<typeof vi.fn>;
-  on: ReturnType<typeof vi.fn>;
+interface PatchedPlugin {
+  editMode: MarkdownEditView;
+  getConfig: ReturnType<typeof vi.fn>;
+  nextExtensions: ExtensionsHolder;
+  plugin: Plugin;
+  updateOptions: ReturnType<typeof vi.fn>;
 }
 
-type PatchMap = Record<string, (next: (...args: unknown[]) => unknown) => (...args: unknown[]) => unknown>;
+const HARDCODED_TAB_SIZE = 4;
+const DIFFERENT_TAB_SIZE = 2;
 
-interface PluginPrivateMethods {
-  getDynamicExtensions(next: () => Extension[], markdownEditView: unknown): Extension[];
-  isPatched: boolean;
-  patchDynamicExtensions(): void;
-}
+const manifest: PluginManifest = {
+  author: 'Test Author',
+  description: 'Fixes the tab size.',
+  id: 'fix-tab-size',
+  minAppVersion: '1.0.0',
+  name: 'Fix Tab Size',
+  version: '1.2.9'
+};
 
-function noopFn(): void {
-  // Intentional no-op: default function when no original exists on the target.
-}
-
-vi.mock('obsidian-dev-utils/obsidian/components/monkey-around-component', () => ({
-  MonkeyAroundComponent: class MockMonkeyAroundComponent {
-    public registerPatch(target: object, patches: PatchMap): void {
-      for (const [key, factory] of Object.entries(patches)) {
-        const original = (target as Record<string, (...args: unknown[]) => unknown>)[key] ?? noopFn;
-        (target as Record<string, unknown>)[key] = factory(original);
-      }
-    }
-  }
-}));
-
-vi.mock('obsidian-dev-utils/object-utils', () => ({
-  castTo: (value: unknown): unknown => value,
-  getPrototypeOf: vi.fn((obj: unknown) => Object.getPrototypeOf(obj as object))
-}));
-
-vi.mock('obsidian-dev-utils/obsidian/plugin/plugin', () => {
-  class MockPluginBase {
-    public app: App;
-    public manifest: PluginManifest;
-
-    public constructor(app: App, manifest: PluginManifest) {
-      this.app = app;
-      this.manifest = manifest;
-    }
-
-    public addChild<T>(child: T): T {
-      return child;
-    }
-
-    public register(): void {
-      // Noop
-    }
-
-    public registerEvent(): void {
-      // Noop
-    }
-  }
-  return { PluginBase: MockPluginBase };
-});
-
-vi.mock('@obsidian-typings/obsidian-public-latest/implementations', () => ({
-  ViewType: {
-    Markdown: 'markdown'
-  }
-}));
-
-const MockMarkdownViewClass = vi.hoisted(() => {
-  class EditModeGrandparent {
-    public getDynamicExtensions(): unknown[] {
-      return [];
-    }
-  }
-  class EditModeParent extends EditModeGrandparent {}
-  class EditModeChild extends EditModeParent {
-    public updateOptions = vi.fn();
-  }
-
-  return class {
-    public editMode = new EditModeChild();
+// Stub the one dev-utils utility that the real PluginBase.onload() reads off the app.
+// The strict mock App lacks the shared-state bag, so return a value-wrapper double.
+vi.mock('obsidian-dev-utils/obsidian/app', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('obsidian-dev-utils/obsidian/app')>();
+  return {
+    ...actual,
+    getObsidianDevUtilsState: vi.fn((_app: AppOriginal | null, _key: string, defaultValue: unknown) => ({ value: defaultValue }))
   };
 });
 
-vi.mock('obsidian', () => ({
-  MarkdownEditView: vi.fn(),
-  MarkdownView: MockMarkdownViewClass
-}));
-
-// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede imports.
-import { MarkdownView } from 'obsidian';
-
-// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede imports.
+// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede this import.
 import { Plugin } from './plugin.ts';
 
-function asPrivate(p: Plugin): PluginPrivateMethods {
-  // eslint-disable-next-line no-restricted-syntax -- Accessing private methods for testing needs double assertion.
-  return p as unknown as PluginPrivateMethods;
-}
-
-function createMockApp(): App {
-  const mockWorkspace: MockWorkspace = {
-    getLeavesOfType: vi.fn().mockReturnValue([]),
-    on: vi.fn().mockReturnValue({ id: 'event-ref' })
-  };
-  const mockVault: MockVault = {
-    getConfig: vi.fn()
-  };
-  return castTo<App>({
-    vault: mockVault,
-    workspace: mockWorkspace
-  });
-}
-
-function createMockMarkdownView(): MockMarkdownView {
-  // eslint-disable-next-line no-restricted-syntax -- Mocked MarkdownView constructor takes no args, real signature expects a leaf.
-  const MockedMarkdownView = MarkdownView as unknown as new () => MarkdownView;
-  const view = new MockedMarkdownView();
-  // eslint-disable-next-line no-restricted-syntax -- Mocked class needs double assertion to match interface.
-  return view as unknown as MockMarkdownView;
-}
-
-function getMockApp(app: App): MockAppShape {
-  // eslint-disable-next-line no-restricted-syntax -- castTo used to extract mock shape from App type.
-  return app as unknown as MockAppShape;
-}
-
 describe('Plugin', () => {
-  let plugin: Plugin;
-  let mockApp: App;
+  let appMock: App;
+  let app: AppOriginal;
+  const loadedPlugins: Plugin[] = [];
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApp = createMockApp();
-    plugin = new Plugin(mockApp, castTo<PluginManifest>({ id: 'fix-tab-size' }));
+    appMock = App.createConfigured__();
+    appMock.workspace.onLayoutReady = vi.fn((callback: () => void) => {
+      callback();
+    });
+    app = appMock.asOriginalType__();
   });
 
   afterEach(() => {
+    while (loadedPlugins.length > 0) {
+      loadedPlugins.pop()?.unload();
+    }
     vi.restoreAllMocks();
   });
 
-  it('should register layout-change event on construction', () => {
-    const { workspace } = getMockApp(mockApp);
+  it('should patch markdown views on layout change', async () => {
+    const { updateOptions } = await loadPatchedPlugin();
 
-    expect(workspace.on).toHaveBeenCalledWith('layout-change', expect.any(Function));
+    expect(updateOptions).toHaveBeenCalledTimes(1);
   });
 
-  describe('patchDynamicExtensions', () => {
-    it('should return early if already patched', () => {
-      asPrivate(plugin).isPatched = true;
-      const { workspace } = getMockApp(mockApp);
+  it('should update every open markdown view after patching', async () => {
+    const first = createEditMode();
+    const second = createEditMode();
+    setLeaves([createMarkdownLeaf(first.editMode), createMarkdownLeaf(second.editMode)]);
 
-      asPrivate(plugin).patchDynamicExtensions();
+    await loadPlugin();
+    appMock.workspace.trigger('layout-change');
 
-      expect(workspace.getLeavesOfType).not.toHaveBeenCalled();
-    });
+    expect(first.updateOptions).toHaveBeenCalledTimes(1);
+    expect(second.updateOptions).toHaveBeenCalledTimes(1);
+  });
 
-    it('should return early if no markdown views exist', () => {
-      const { workspace } = getMockApp(mockApp);
-      workspace.getLeavesOfType.mockReturnValue([]);
+  it('should not re-patch on a second layout change', async () => {
+    const { updateOptions } = await loadPatchedPlugin();
+    const getLeavesOfType = vi.mocked(appMock.workspace.getLeavesOfType);
+    getLeavesOfType.mockClear();
+    updateOptions.mockClear();
 
-      asPrivate(plugin).patchDynamicExtensions();
+    appMock.workspace.trigger('layout-change');
 
-      expect(asPrivate(plugin).isPatched).toBe(false);
-    });
+    expect(getLeavesOfType).not.toHaveBeenCalled();
+    expect(updateOptions).not.toHaveBeenCalled();
+  });
 
-    it('should return early if views are not MarkdownView instances', () => {
-      const { workspace } = getMockApp(mockApp);
-      const nonMarkdownLeaf = { view: { editMode: { updateOptions: vi.fn() } } };
-      workspace.getLeavesOfType.mockReturnValue([nonMarkdownLeaf]);
+  it('should not patch when no markdown views exist', async () => {
+    const { updateOptions } = createEditMode();
+    setLeaves([]);
 
-      asPrivate(plugin).patchDynamicExtensions();
+    await loadPlugin();
+    appMock.workspace.trigger('layout-change');
 
-      expect(asPrivate(plugin).isPatched).toBe(false);
-    });
+    expect(updateOptions).not.toHaveBeenCalled();
+  });
 
-    it('should patch and update markdown views when available', () => {
-      const { workspace } = getMockApp(mockApp);
-      const mockView = createMockMarkdownView();
-      workspace.getLeavesOfType.mockReturnValue([{ view: mockView }]);
+  it('should not patch when leaves are not markdown views', async () => {
+    const { updateOptions } = createEditMode();
+    const nonMarkdownLeaf = castTo<WorkspaceLeaf>({ view: { editMode: { updateOptions } } });
+    setLeaves([nonMarkdownLeaf]);
 
-      asPrivate(plugin).patchDynamicExtensions();
+    await loadPlugin();
+    appMock.workspace.trigger('layout-change');
 
-      expect(asPrivate(plugin).isPatched).toBe(true);
-      expect(mockView.editMode.updateOptions).toHaveBeenCalled();
-    });
-
-    it('should update all markdown views after patching', () => {
-      const { workspace } = getMockApp(mockApp);
-      const mockView1 = createMockMarkdownView();
-      const mockView2 = createMockMarkdownView();
-      workspace.getLeavesOfType.mockReturnValue([{ view: mockView1 }, { view: mockView2 }]);
-
-      asPrivate(plugin).patchDynamicExtensions();
-
-      expect(mockView1.editMode.updateOptions).toHaveBeenCalled();
-      expect(mockView2.editMode.updateOptions).toHaveBeenCalled();
-    });
-
-    it('should not re-patch if already patched on second call', () => {
-      const { workspace } = getMockApp(mockApp);
-      const mockView = createMockMarkdownView();
-      workspace.getLeavesOfType.mockReturnValue([{ view: mockView }]);
-
-      asPrivate(plugin).patchDynamicExtensions();
-      vi.clearAllMocks();
-      asPrivate(plugin).patchDynamicExtensions();
-
-      expect(workspace.getLeavesOfType).not.toHaveBeenCalled();
-    });
+    expect(updateOptions).not.toHaveBeenCalled();
   });
 
   describe('getDynamicExtensions', () => {
-    it('should pass through extensions when useTab is true', () => {
-      const { vault } = getMockApp(mockApp);
-      vault.getConfig.mockImplementation((key: string) => {
-        if (key === 'useTab') {
-          return true;
-        }
-        return undefined;
-      });
+    it('should pass extensions through unchanged when useTab is true', async () => {
+      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
+      getConfig.mockImplementation((key: string) => key === 'useTab');
+      nextExtensions.value = makeExtensions('    ');
 
-      // eslint-disable-next-line no-restricted-syntax -- Mock extension objects need double assertion to match Extension type.
-      const extensions = [{ value: 'test' }] as unknown as Extension[];
-      const next = vi.fn().mockReturnValue(extensions);
+      const result = editMode.getDynamicExtensions();
 
-      const result = asPrivate(plugin).getDynamicExtensions(next, {});
-
-      expect(result).toBe(extensions);
+      expect(result).toBe(nextExtensions.value);
     });
 
-    it('should not modify extensions when tabSize equals hardcoded value of 4', () => {
-      const HARDCODED_TAB_SIZE = 4;
-      const { vault } = getMockApp(mockApp);
-      vault.getConfig.mockImplementation((key: string) => {
-        if (key === 'useTab') {
-          return false;
-        }
-        if (key === 'tabSize') {
-          return HARDCODED_TAB_SIZE;
-        }
-        return undefined;
-      });
+    it('should not modify extensions when tabSize equals the hardcoded value', async () => {
+      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
+      getConfig.mockImplementation((key: string) => key === 'tabSize' ? HARDCODED_TAB_SIZE : false);
+      nextExtensions.value = makeExtensions('    ');
 
-      // eslint-disable-next-line no-restricted-syntax -- Mock extension objects need double assertion to match Extension type.
-      const extensions = [{ value: '    ' }] as unknown as Extension[];
-      const next = vi.fn().mockReturnValue(extensions);
+      const result = editMode.getDynamicExtensions();
 
-      const result = asPrivate(plugin).getDynamicExtensions(next, {});
-
-      expect(result).toBe(extensions);
-      // eslint-disable-next-line no-restricted-syntax -- Accessing mock extension value property needs double assertion.
-      expect((result[0] as unknown as ExtensionWithValue).value).toBe('    ');
+      expect(extensionValue(result[0])).toBe('    ');
     });
 
-    it('should replace tab size when useTab is false and tabSize differs from 4', () => {
-      const TAB_SIZE = 2;
-      const { vault } = getMockApp(mockApp);
-      vault.getConfig.mockImplementation((key: string) => {
-        if (key === 'useTab') {
-          return false;
-        }
-        if (key === 'tabSize') {
-          return TAB_SIZE;
-        }
-        return undefined;
-      });
+    it('should rewrite the tab-size extension when useTab is false and tabSize differs', async () => {
+      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
+      getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
+      nextExtensions.value = makeExtensions('    ');
 
-      // eslint-disable-next-line no-restricted-syntax -- Mock extension objects need double assertion to match Extension type.
-      const extensions = [{ value: '    ' }] as unknown as Extension[];
-      const next = vi.fn().mockReturnValue(extensions);
+      const result = editMode.getDynamicExtensions();
 
-      const result = asPrivate(plugin).getDynamicExtensions(next, {});
-
-      // eslint-disable-next-line no-restricted-syntax -- Accessing mock extension value property needs double assertion.
-      expect((result[0] as unknown as ExtensionWithValue).value).toBe('  ');
+      expect(extensionValue(result[0])).toBe('  ');
     });
 
-    it('should not modify extensions when no matching tab size extension is found', () => {
-      const TAB_SIZE = 2;
-      const { vault } = getMockApp(mockApp);
-      vault.getConfig.mockImplementation((key: string) => {
-        if (key === 'useTab') {
-          return false;
-        }
-        if (key === 'tabSize') {
-          return TAB_SIZE;
-        }
-        return undefined;
-      });
+    it('should not modify extensions when no matching tab-size extension is found', async () => {
+      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
+      getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
+      nextExtensions.value = makeExtensions('something-else');
 
-      // eslint-disable-next-line no-restricted-syntax -- Mock extension objects need double assertion to match Extension type.
-      const extensions = [{ value: 'something-else' }] as unknown as Extension[];
-      const next = vi.fn().mockReturnValue(extensions);
+      const result = editMode.getDynamicExtensions();
 
-      const result = asPrivate(plugin).getDynamicExtensions(next, {});
-
-      // eslint-disable-next-line no-restricted-syntax -- Accessing mock extension value property needs double assertion.
-      expect((result[0] as unknown as ExtensionWithValue).value).toBe('something-else');
+      expect(extensionValue(result[0])).toBe('something-else');
     });
 
-    it('should handle extensions without value property', () => {
-      const TAB_SIZE = 2;
-      const { vault } = getMockApp(mockApp);
-      vault.getConfig.mockImplementation((key: string) => {
-        if (key === 'useTab') {
-          return false;
-        }
-        if (key === 'tabSize') {
-          return TAB_SIZE;
-        }
-        return undefined;
-      });
+    it('should ignore extensions without a value property', async () => {
+      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
+      getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
+      nextExtensions.value = castTo<Extension[]>([{}]);
 
-      // eslint-disable-next-line no-restricted-syntax -- Mock extension objects need double assertion to match Extension type.
-      const extensions = [{}] as unknown as Extension[];
-      const next = vi.fn().mockReturnValue(extensions);
+      const result = editMode.getDynamicExtensions();
 
-      const result = asPrivate(plugin).getDynamicExtensions(next, {});
-
-      expect(result).toBe(extensions);
+      expect(result).toBe(nextExtensions.value);
     });
   });
+
+  function createEditMode(): EditModeContext {
+    const nextExtensions: ExtensionsHolder = { value: [] };
+
+    class EditModeGrandparent {
+      public getDynamicExtensions(): Extension[] {
+        return nextExtensions.value;
+      }
+    }
+    class EditModeParent extends EditModeGrandparent {}
+    const updateOptions = vi.fn();
+    class EditModeChild extends EditModeParent {
+      public updateOptions = updateOptions;
+    }
+
+    return {
+      editMode: castTo<MarkdownEditView>(new EditModeChild()),
+      nextExtensions,
+      updateOptions
+    };
+  }
+
+  function createMarkdownLeaf(editMode: MarkdownEditView): WorkspaceLeaf {
+    const view = castTo<MarkdownView>(Object.create(MarkdownView.prototype));
+    castTo<EditModeHolder>(view).editMode = editMode;
+    return castTo<WorkspaceLeaf>({ view });
+  }
+
+  function setLeaves(leaves: WorkspaceLeaf[]): void {
+    appMock.workspace.getLeavesOfType = castTo<typeof appMock.workspace.getLeavesOfType>(vi.fn(() => leaves));
+  }
+
+  function stubGetConfig(): ReturnType<typeof vi.fn> {
+    const getConfig = vi.fn();
+    castTo<GetConfigHolder>(appMock.vault).getConfig = getConfig;
+    return getConfig;
+  }
+
+  async function loadPlugin(): Promise<Plugin> {
+    const plugin = new Plugin(app, manifest);
+    await plugin.onload();
+    loadedPlugins.push(plugin);
+    return plugin;
+  }
+
+  async function loadPatchedPlugin(): Promise<PatchedPlugin> {
+    const { editMode, nextExtensions, updateOptions } = createEditMode();
+    const getConfig = stubGetConfig();
+    setLeaves([createMarkdownLeaf(editMode)]);
+    const plugin = await loadPlugin();
+    appMock.workspace.trigger('layout-change');
+    return { editMode, getConfig, nextExtensions, plugin, updateOptions };
+  }
 });
+
+function extensionValue(extension: Extension | undefined): string | undefined {
+  return castTo<ExtensionWithValue | undefined>(extension)?.value;
+}
+
+function makeExtensions(value: string): Extension[] {
+  return castTo<Extension[]>([{ value }]);
+}
