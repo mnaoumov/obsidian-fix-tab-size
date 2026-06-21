@@ -1,9 +1,4 @@
 import type { Extension } from '@codemirror/state';
-import type {
-  App,
-  PluginManifest
-} from 'obsidian';
-
 import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
 import {
   MarkdownEditView,
@@ -12,6 +7,7 @@ import {
 import { getPrototypeOf } from 'obsidian-dev-utils/object-utils';
 import { MonkeyAroundComponent } from 'obsidian-dev-utils/obsidian/components/monkey-around-component';
 import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
+import { ValueWrapper } from 'obsidian-dev-utils/value-wrapper';
 
 type ExtensionWithValue = {
   value: string;
@@ -23,10 +19,9 @@ const HARDCODED_TAB_SIZE = 4;
 
 export class Plugin extends PluginBase {
   private isPatched = false;
-  private readonly monkeyAroundComponent: MonkeyAroundComponent;
+  private monkeyAroundComponent!: MonkeyAroundComponent;
 
-  public constructor(app: App, manifest: PluginManifest) {
-    super(app, manifest);
+ protected override onloadImpl(): void {
     this.monkeyAroundComponent = this.addChild(new MonkeyAroundComponent());
     this.registerEvent(this.app.workspace.on('layout-change', this.patchDynamicExtensions.bind(this)));
   }
@@ -37,9 +32,7 @@ export class Plugin extends PluginBase {
     if (!this.app.vault.getConfig('useTab')) {
       const tabSize = this.app.vault.getConfig('tabSize') as number;
       if (tabSize !== HARDCODED_TAB_SIZE) {
-        const tabSizeExtension = extensions.find((extension: Extension) =>
-          (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)
-        ) as
+        const tabSizeExtension = extensions.find((extension: Extension) => (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)) as
           | ExtensionWithValue
           | null;
         if (tabSizeExtension) {
@@ -65,12 +58,12 @@ export class Plugin extends PluginBase {
     this.isPatched = true;
 
     const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownViews[0].editMode)));
-    const that = this;
+    const thisWrapper = ValueWrapper.of(this);
     this.monkeyAroundComponent.registerPatch(proto, {
       /* v8 ignore start -- Runtime-only callback executed inside Obsidian's patched method. */
       getDynamicExtensions: (next: GetDynamicExtensionsFn): GetDynamicExtensionsFn => {
         return function getDynamicExtensionsPatched(this: MarkdownEditView): Extension[] {
-          return that.getDynamicExtensions(next, this);
+          return thisWrapper.value.getDynamicExtensions(next, this);
         };
       }
       /* v8 ignore stop */
