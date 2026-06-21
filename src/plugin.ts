@@ -10,9 +10,11 @@ import { MonkeyAroundComponent } from 'obsidian-dev-utils/obsidian/components/mo
 import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
 import { ValueWrapper } from 'obsidian-dev-utils/value-wrapper';
 
-type ExtensionWithValue = {
+interface ExtensionValue {
   value: string;
-} & Extension;
+}
+
+type ExtensionWithValue = Extension & ExtensionValue;
 
 type GetDynamicExtensionsFn = MarkdownEditView['getDynamicExtensions'];
 
