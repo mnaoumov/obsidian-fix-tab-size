@@ -1,15 +1,12 @@
-import type { Extension } from '@codemirror/state';
 import type {
   App as AppOriginal,
-  MarkdownEditView,
-  PluginManifest,
-  WorkspaceLeaf
+  PluginManifest
 } from 'obsidian';
 
 import { castTo } from 'obsidian-dev-utils/object-utils';
 import {
   App,
-  MarkdownView
+  Component
 } from 'obsidian-test-mocks/obsidian';
 import {
   afterEach,
@@ -19,39 +16,6 @@ import {
   it,
   vi
 } from 'vitest';
-
-interface EditModeContext {
-  editMode: MarkdownEditView;
-  nextExtensions: ExtensionsHolder;
-  updateOptions: ReturnType<typeof vi.fn>;
-}
-
-interface EditModeHolder {
-  editMode: MarkdownEditView;
-}
-
-interface ExtensionsHolder {
-  value: Extension[];
-}
-
-interface ExtensionWithValue {
-  value: string;
-}
-
-interface GetConfigHolder {
-  getConfig: ReturnType<typeof vi.fn>;
-}
-
-interface PatchedPlugin {
-  editMode: MarkdownEditView;
-  getConfig: ReturnType<typeof vi.fn>;
-  nextExtensions: ExtensionsHolder;
-  plugin: Plugin;
-  updateOptions: ReturnType<typeof vi.fn>;
-}
-
-const HARDCODED_TAB_SIZE = 4;
-const DIFFERENT_TAB_SIZE = 2;
 
 const manifest: PluginManifest = {
   author: 'Test Author',
@@ -72,7 +36,21 @@ vi.mock('obsidian-dev-utils/obsidian/app', async (importOriginal) => {
   };
 });
 
-// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede this import.
+// Replace the child component with a real (empty) Component so addChild's load contract holds.
+// Recording the constructor call lets the delegation to FixTabSizeComponent be asserted.
+vi.mock('./fix-tab-size-component.ts', async () => {
+  const { Component: ComponentMock } = await vi.importActual<typeof import('obsidian-test-mocks/obsidian')>('obsidian-test-mocks/obsidian');
+  return {
+    // eslint-disable-next-line prefer-arrow-callback -- the mock must be `new`-able, and arrow functions cannot be constructed.
+    FixTabSizeComponent: vi.fn(function FixTabSizeComponentStub() {
+      return new ComponentMock();
+    })
+  };
+});
+
+// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede these imports.
+import { FixTabSizeComponent } from './fix-tab-size-component.ts';
+// eslint-disable-next-line import-x/first, import-x/imports-first -- vi.mock must precede these imports.
 import { Plugin } from './plugin.ts';
 
 describe('Plugin', () => {
@@ -96,167 +74,15 @@ describe('Plugin', () => {
     vi.restoreAllMocks();
   });
 
-  it('should patch markdown views on layout change', async () => {
-    const { updateOptions } = await loadPatchedPlugin();
-
-    expect(updateOptions).toHaveBeenCalledTimes(1);
-  });
-
-  it('should update every open markdown view after patching', async () => {
-    const first = createEditMode();
-    const second = createEditMode();
-    setLeaves([createMarkdownLeaf(first.editMode), createMarkdownLeaf(second.editMode)]);
-
-    await loadPlugin();
-    appMock.workspace.trigger('layout-change');
-
-    expect(first.updateOptions).toHaveBeenCalledTimes(1);
-    expect(second.updateOptions).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not re-patch on a second layout change', async () => {
-    const { updateOptions } = await loadPatchedPlugin();
-    const getLeavesOfType = vi.mocked(appMock.workspace.getLeavesOfType);
-    getLeavesOfType.mockClear();
-    updateOptions.mockClear();
-
-    appMock.workspace.trigger('layout-change');
-
-    expect(getLeavesOfType).not.toHaveBeenCalled();
-    expect(updateOptions).not.toHaveBeenCalled();
-  });
-
-  it('should not patch when no markdown views exist', async () => {
-    const { updateOptions } = createEditMode();
-    setLeaves([]);
-
-    await loadPlugin();
-    appMock.workspace.trigger('layout-change');
-
-    expect(updateOptions).not.toHaveBeenCalled();
-  });
-
-  it('should not patch when leaves are not markdown views', async () => {
-    const { updateOptions } = createEditMode();
-    const nonMarkdownLeaf = castTo<WorkspaceLeaf>({ view: { editMode: { updateOptions } } });
-    setLeaves([nonMarkdownLeaf]);
-
-    await loadPlugin();
-    appMock.workspace.trigger('layout-change');
-
-    expect(updateOptions).not.toHaveBeenCalled();
-  });
-
-  describe('getDynamicExtensions', () => {
-    it('should pass extensions through unchanged when useTab is true', async () => {
-      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
-      getConfig.mockImplementation((key: string) => key === 'useTab');
-      nextExtensions.value = makeExtensions('    ');
-
-      const result = editMode.getDynamicExtensions();
-
-      expect(result).toBe(nextExtensions.value);
-    });
-
-    it('should not modify extensions when tabSize equals the hardcoded value', async () => {
-      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
-      getConfig.mockImplementation((key: string) => key === 'tabSize' ? HARDCODED_TAB_SIZE : false);
-      nextExtensions.value = makeExtensions('    ');
-
-      const result = editMode.getDynamicExtensions();
-
-      expect(extensionValue(result[0])).toBe('    ');
-    });
-
-    it('should rewrite the tab-size extension when useTab is false and tabSize differs', async () => {
-      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
-      getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
-      nextExtensions.value = makeExtensions('    ');
-
-      const result = editMode.getDynamicExtensions();
-
-      expect(extensionValue(result[0])).toBe('  ');
-    });
-
-    it('should not modify extensions when no matching tab-size extension is found', async () => {
-      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
-      getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
-      nextExtensions.value = makeExtensions('something-else');
-
-      const result = editMode.getDynamicExtensions();
-
-      expect(extensionValue(result[0])).toBe('something-else');
-    });
-
-    it('should ignore extensions without a value property', async () => {
-      const { editMode, getConfig, nextExtensions } = await loadPatchedPlugin();
-      getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
-      nextExtensions.value = castTo<Extension[]>([{}]);
-
-      const result = editMode.getDynamicExtensions();
-
-      expect(result).toBe(nextExtensions.value);
-    });
-  });
-
-  function createEditMode(): EditModeContext {
-    const nextExtensions: ExtensionsHolder = { value: [] };
-
-    class EditModeGrandparent {
-      public getDynamicExtensions(): Extension[] {
-        return nextExtensions.value;
-      }
-    }
-    class EditModeParent extends EditModeGrandparent {}
-    const updateOptions = vi.fn();
-    class EditModeChild extends EditModeParent {
-      public updateOptions = updateOptions;
-    }
-
-    return {
-      editMode: castTo<MarkdownEditView>(new EditModeChild()),
-      nextExtensions,
-      updateOptions
-    };
-  }
-
-  function createMarkdownLeaf(editMode: MarkdownEditView): WorkspaceLeaf {
-    const view = castTo<MarkdownView>(Object.create(MarkdownView.prototype));
-    castTo<EditModeHolder>(view).editMode = editMode;
-    return castTo<WorkspaceLeaf>({ view });
-  }
-
-  function setLeaves(leaves: WorkspaceLeaf[]): void {
-    appMock.workspace.getLeavesOfType = castTo<typeof appMock.workspace.getLeavesOfType>(vi.fn(() => leaves));
-  }
-
-  function stubGetConfig(): ReturnType<typeof vi.fn> {
-    const getConfig = vi.fn();
-    castTo<GetConfigHolder>(appMock.vault).getConfig = getConfig;
-    return getConfig;
-  }
-
-  async function loadPlugin(): Promise<Plugin> {
+  it('should add a FixTabSizeComponent constructed with the app as a child', async () => {
     const plugin = new Plugin(app, manifest);
+    const addChildSpy = vi.spyOn(plugin, 'addChild');
+
     await plugin.onload();
     loadedPlugins.push(plugin);
-    return plugin;
-  }
 
-  async function loadPatchedPlugin(): Promise<PatchedPlugin> {
-    const { editMode, nextExtensions, updateOptions } = createEditMode();
-    const getConfig = stubGetConfig();
-    setLeaves([createMarkdownLeaf(editMode)]);
-    const plugin = await loadPlugin();
-    appMock.workspace.trigger('layout-change');
-    return { editMode, getConfig, nextExtensions, plugin, updateOptions };
-  }
+    const constructedComponent = castTo<Component>(vi.mocked(FixTabSizeComponent).mock.results[0]?.value);
+    expect(FixTabSizeComponent).toHaveBeenCalledWith({ app });
+    expect(addChildSpy).toHaveBeenCalledWith(constructedComponent);
+  });
 });
-
-function extensionValue(extension: Extension | undefined): string | undefined {
-  return castTo<ExtensionWithValue | undefined>(extension)?.value;
-}
-
-function makeExtensions(value: string): Extension[] {
-  return castTo<Extension[]>([{ value }]);
-}

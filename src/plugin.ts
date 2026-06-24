@@ -1,77 +1,13 @@
-import type { Extension } from '@codemirror/state';
-
-import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
-import {
-  MarkdownEditView,
-  MarkdownView
-} from 'obsidian';
-import { getPrototypeOf } from 'obsidian-dev-utils/object-utils';
-import { MonkeyAroundComponent } from 'obsidian-dev-utils/obsidian/components/monkey-around-component';
 import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
-import { ValueWrapper } from 'obsidian-dev-utils/value-wrapper';
 
-interface ExtensionValue {
-  value: string;
-}
-
-type ExtensionWithValue = Extension & ExtensionValue;
-
-type GetDynamicExtensionsFn = MarkdownEditView['getDynamicExtensions'];
-
-const HARDCODED_TAB_SIZE = 4;
+import { FixTabSizeComponent } from './fix-tab-size-component.ts';
 
 export class Plugin extends PluginBase {
-  private isPatched = false;
-  private readonly monkeyAroundComponent = new MonkeyAroundComponent();
-
   protected override onloadImpl(): void {
-    this.addChild(this.monkeyAroundComponent);
-    this.registerEvent(this.app.workspace.on('layout-change', this.patchDynamicExtensions.bind(this)));
-  }
-
-  private getDynamicExtensions(next: GetDynamicExtensionsFn, markdownEditView: MarkdownEditView): Extension[] {
-    const extensions = next.call(markdownEditView);
-
-    if (!this.app.vault.getConfig('useTab')) {
-      const tabSize = this.app.vault.getConfig('tabSize') as number;
-      if (tabSize !== HARDCODED_TAB_SIZE) {
-        const tabSizeExtension = extensions.find((extension: Extension) => (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)) as
-          | ExtensionWithValue
-          | null;
-        if (tabSizeExtension) {
-          tabSizeExtension.value = ' '.repeat(tabSize);
-        }
-      }
-    }
-
-    return extensions;
-  }
-
-  private patchDynamicExtensions(): void {
-    if (this.isPatched) {
-      return;
-    }
-
-    const markdownViews = this.app.workspace.getLeavesOfType(ViewType.Markdown).flatMap((leaf) => leaf.view instanceof MarkdownView ? [leaf.view] : []);
-
-    if (markdownViews.length === 0 || !markdownViews[0]) {
-      return;
-    }
-
-    this.isPatched = true;
-
-    const proto = getPrototypeOf(getPrototypeOf(getPrototypeOf(markdownViews[0].editMode)));
-    const thisWrapper = ValueWrapper.of(this);
-    this.monkeyAroundComponent.registerPatch(proto, {
-      getDynamicExtensions: (next: GetDynamicExtensionsFn): GetDynamicExtensionsFn => {
-        return function getDynamicExtensionsPatched(this: MarkdownEditView): Extension[] {
-          return thisWrapper.value.getDynamicExtensions(next, this);
-        };
-      }
-    });
-
-    for (const markdownView of markdownViews) {
-      markdownView.editMode.updateOptions();
-    }
+    this.addChild(
+      new FixTabSizeComponent({
+        app: this.app
+      })
+    );
   }
 }
