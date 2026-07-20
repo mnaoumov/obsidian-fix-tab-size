@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.2.12
+
+- docs: standardize demo-vault README
+- docs: drop per-plugin demo-vault setup notes (bootstrap covered by ODU harness)
+- Merge branch 'T109': create the Fix Tab Size demo vault (S2)
+- chore: update libs
+- docs: update
+- docs: migrate to AGENTS.md
+
 ## 1.2.11
 
 - chore: update libs
