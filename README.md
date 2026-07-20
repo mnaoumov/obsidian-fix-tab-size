@@ -17,6 +17,14 @@ But Obsidian partially ignores this setting and always inserts 4 spaces when you
 
 This plugin fixes the editor tab size making it to match `Indent visual width` setting.
 
+## Demo vault
+
+A demo vault with usage examples ships with every release. You can access it via any of the following:
+
+1. Running the **Fix Tab Size: Open demo vault** command.
+2. Downloading `fix-tab-size.demo-vault.zip` from the [Releases](https://github.com/mnaoumov/obsidian-fix-tab-size/releases).
+3. Browsing its source in [`demo-vault/`](./demo-vault/README.md) in this repository.
+
 ## Installation
 
 The plugin is available in [the official Community Plugins repository](https://community.obsidian.md/plugins/fix-tab-size).
