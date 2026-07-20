@@ -85,4 +85,14 @@ describe('Plugin', () => {
     expect(FixTabSizeComponent).toHaveBeenCalledWith({ app });
     expect(addChildSpy).toHaveBeenCalledWith(constructedComponent);
   });
+
+  it('should register the open demo vault command', async () => {
+    const plugin = new Plugin(app, manifest);
+    const addCommandSpy = vi.spyOn(plugin, 'addCommand');
+
+    await plugin.onload();
+    loadedPlugins.push(plugin);
+
+    expect(addCommandSpy).toHaveBeenCalledWith(expect.objectContaining({ id: 'open-demo-vault' }));
+  });
 });
