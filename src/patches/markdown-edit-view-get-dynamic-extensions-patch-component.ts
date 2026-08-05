@@ -31,8 +31,8 @@ export class MarkdownEditViewGetDynamicExtensionsPatchComponent extends MonkeyAr
 
   public override onload(): void {
     this.registerMethodPatch({
+      $object: getPrototypeOf(getPrototypeOf(getPrototypeOf(this.markdownEditView))),
       methodName: 'getDynamicExtensions',
-      obj: getPrototypeOf(getPrototypeOf(getPrototypeOf(this.markdownEditView))),
       patchHandler: ({
         fallback
       }) => {

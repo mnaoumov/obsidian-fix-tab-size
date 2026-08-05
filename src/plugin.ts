@@ -11,7 +11,7 @@ export class Plugin extends PluginBase {
       })
     );
 
-    this.commandHandlerComponent.registerCommandHandlers([
+    this.commandHandlerComponent.registerCommandHandlers(() => [
       new OpenDemoVaultCommandHandler({
         app: this.app,
         pluginId: this.manifest.id,
