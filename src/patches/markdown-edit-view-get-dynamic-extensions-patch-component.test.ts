@@ -67,7 +67,7 @@ describe('MarkdownEditViewGetDynamicExtensionsPatchComponent', () => {
   it('should pass extensions through unchanged when useTab is true', () => {
     loadComponent();
     getConfig.mockImplementation((key: string) => key === 'useTab');
-    nextExtensions.value = makeExtensions('    ');
+    nextExtensions.value = makeExtensions(' '.repeat(4));
 
     const result = editMode.getDynamicExtensions();
 
@@ -77,17 +77,17 @@ describe('MarkdownEditViewGetDynamicExtensionsPatchComponent', () => {
   it('should not modify extensions when tabSize equals the hardcoded value', () => {
     loadComponent();
     getConfig.mockImplementation((key: string) => key === 'tabSize' ? HARDCODED_TAB_SIZE : false);
-    nextExtensions.value = makeExtensions('    ');
+    nextExtensions.value = makeExtensions(' '.repeat(4));
 
     const result = editMode.getDynamicExtensions();
 
-    expect(extensionValue(result[0])).toBe('    ');
+    expect(extensionValue(result[0])).toBe(' '.repeat(4));
   });
 
   it('should rewrite the tab-size extension when useTab is false and tabSize differs', () => {
     loadComponent();
     getConfig.mockImplementation((key: string) => key === 'tabSize' ? DIFFERENT_TAB_SIZE : false);
-    nextExtensions.value = makeExtensions('    ');
+    nextExtensions.value = makeExtensions(' '.repeat(4));
 
     const result = editMode.getDynamicExtensions();
 

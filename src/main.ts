@@ -1,6 +1,1 @@
-// eslint-disable-next-line import-x/no-unassigned-import, import-x/no-empty-named-blocks -- Easiest way to enable typings.
-import type {} from '@obsidian-typings/obsidian-public-latest';
-
-import { Plugin } from './plugin.ts';
-
-export default Plugin;
+export { Plugin as default } from './plugin.ts';
