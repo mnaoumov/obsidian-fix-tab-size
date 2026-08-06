@@ -4,14 +4,14 @@ import { PluginBase } from 'obsidian-dev-utils/obsidian/plugin/plugin';
 import { FixTabSizeComponent } from './fix-tab-size-component.ts';
 
 export class Plugin extends PluginBase {
-  protected override onloadImpl(): void {
+  protected override async onloadImpl(): Promise<void> {
     this.addChild(
       new FixTabSizeComponent({
         app: this.app
       })
     );
 
-    this.commandHandlerComponent.registerCommandHandlers(() => [
+    await this.commandHandlerComponent.registerCommandHandlers(() => [
       new OpenDemoVaultCommandHandler({
         app: this.app,
         pluginId: this.manifest.id,
