@@ -14,7 +14,9 @@
     "Invocables",
     "mnaoumov",
     "Naumov",
-    "tsbuildinfo"
+    "tsbuildinfo",
+    "wikilink",
+    "wikilinks"
   ],
   "ignoreWords": [],
   "import": [],
