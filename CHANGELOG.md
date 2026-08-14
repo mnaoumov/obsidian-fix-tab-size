@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.18
+
+- docs: make the demo vault the documentation, in the standard layout
+
 ## 1.2.17
 
 - chore: update libs and adopt obsidian-integration-testing 10
