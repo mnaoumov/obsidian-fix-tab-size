@@ -1,3 +1,5 @@
+# Fix Tab Size demo vault
+
 This is an [Obsidian](https://obsidian.md/) vault demonstrating features of the [Fix Tab Size](https://github.com/mnaoumov/obsidian-fix-tab-size) plugin.
 
 ## Opening this vault

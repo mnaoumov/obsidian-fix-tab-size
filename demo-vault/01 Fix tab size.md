@@ -1,8 +1,8 @@
-[Docs](https://github.com/mnaoumov/obsidian-fix-tab-size/)
-
 # Fix tab size
 
 Obsidian has an **Indent visual width** setting (**Settings -> Editor -> Indent visual width**), but the editor ignores it for real tab characters: a hard `Tab` is always rendered at Obsidian's own fixed width, no matter what you configured. **Fix Tab Size** makes the editor render each tab at the width you set, so tab-indented text lines up the way you expect.
+
+![Obsidian's Indent visual width setting](<./_assets/images/tab-size.png>)
 
 ## Try it
 
