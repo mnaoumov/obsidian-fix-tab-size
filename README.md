@@ -5,25 +5,35 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/mnaoumov/obsidian-fix-tab-size/total)](https://github.com/mnaoumov/obsidian-fix-tab-size/releases)
 [![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/mnaoumov/obsidian-fix-tab-size)
 
-This is a plugin for [Obsidian](https://obsidian.md/) that fixes tab size according to the settings.
+[Obsidian](https://obsidian.md/) has an **Indent visual width** setting, and then ignores it for real
+tab characters: press `Tab` with `Indent using tabs` on and the editor always draws that tab at its own
+fixed width, whatever you configured. Tab-indented text therefore lines up differently in Obsidian than
+in every other editor that opens the same file.
 
-As reported on the [forum](https://forum.obsidian.md/t/customizing-universal-tab-size/7998/2):
+This plugin makes the editor render each tab at the width you actually set, so the indentation you see
+is the indentation you chose.
 
-Obsidian has setting for tab size:
-
-![Tab size](./images/tab-size.png)
-
-But Obsidian partially ignores this setting and always inserts 4 spaces when you press `Tab` button in the editor, if you have setting `Indent using tabs` disabled.
-
-This plugin fixes the editor tab size making it to match `Indent visual width` setting.
+Reported on the [forum](https://forum.obsidian.md/t/customizing-universal-tab-size/7998/2).
 
 ## Demo vault
 
-A demo vault with usage examples ships with every release. You can access it via any of the following:
+**The documentation is a demo vault.** The feature has a note that explains what it does and why you
+would want it, with a tab-indented sample to watch as you change the setting.
+
+**[Start reading here](<./demo-vault/00 Start.md>)** — it is plain markdown, so it works on GitHub with
+nothing installed.
+
+A copy of the vault ships with every release. You can access it via any of the following:
 
 1. Running the **Fix Tab Size: Open demo vault** command.
 2. Downloading `fix-tab-size-demo-vault-<version>.zip` (`<version>` is the release version) from the [Releases](https://github.com/mnaoumov/obsidian-fix-tab-size/releases).
 3. Browsing its source in [`demo-vault/`](./demo-vault/README.md) in this repository.
+
+## What it does
+
+- **Tabs render at your configured width**, matching `Indent visual width` instead of Obsidian's fixed
+  one. There is nothing to configure in the plugin itself.
+  [01 Fix tab size](<./demo-vault/01 Fix tab size.md>)
 
 ## Installation
 
@@ -41,13 +51,21 @@ To install the latest beta release of this plugin (regardless if it is available
 
 By default, debug messages for this plugin are hidden.
 
-To show them, run the following command in the `DevTools Console`:
+To show them, run the following command:
 
 ```js
 window.DEBUG.enable('fix-tab-size');
 ```
 
 For more details, refer to the [documentation](https://mnaoumov.dev/obsidian-dev-utils/guides/debugging/).
+
+## Changelog
+
+All notable changes to this project will be documented in the [CHANGELOG](./CHANGELOG.md).
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING](./CONTRIBUTING.md) to get set up.
 
 ## Support
 
