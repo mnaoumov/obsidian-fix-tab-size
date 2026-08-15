@@ -5,13 +5,14 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/mnaoumov/obsidian-fix-tab-size/total)](https://github.com/mnaoumov/obsidian-fix-tab-size/releases)
 [![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/mnaoumov/obsidian-fix-tab-size)
 
-[Obsidian](https://obsidian.md/) has an **Indent visual width** setting, and then ignores it for real
-tab characters: press `Tab` with `Indent using tabs` on and the editor always draws that tab at its own
-fixed width, whatever you configured. Tab-indented text therefore lines up differently in Obsidian than
-in every other editor that opens the same file.
+[Obsidian](https://obsidian.md/) has an **Indent visual width** setting, and then ignores it whenever
+you indent with **spaces**: turn `Indent using tabs` off, set the width to 2 or 8, and pressing `Tab`
+still inserts exactly **four** spaces. The setting is honoured for real tab characters and hardcoded
+for spaces.
 
-This plugin makes the editor render each tab at the width you actually set, so the indentation you see
-is the indentation you chose.
+This plugin makes one indent insert the number of spaces you actually set, so the indentation you get
+is the indentation you chose. If you indent with tabs, Obsidian already draws them at your configured
+width and this plugin has nothing to do.
 
 Reported on the [forum](https://forum.obsidian.md/t/customizing-universal-tab-size/7998/2).
 
@@ -48,8 +49,9 @@ A copy of the vault ships with every release. You can access it via any of the f
 
 ## What it does
 
-- **Tabs render at your configured width**, matching `Indent visual width` instead of Obsidian's fixed
-  one. There is nothing to configure in the plugin itself.
+- **A space indent is as wide as you configured**, matching `Indent visual width` instead of
+  Obsidian's hardcoded four. Applies while `Indent using tabs` is off; there is nothing to configure in
+  the plugin itself.
   [01 Fix tab size](<./demo-vault/01 Fix tab size.md>)
 
 ## Installation
