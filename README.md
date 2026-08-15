@@ -15,6 +15,23 @@ is the indentation you chose.
 
 Reported on the [forum](https://forum.obsidian.md/t/customizing-universal-tab-size/7998/2).
 
+<!-- markdownlint-disable MD033 -->
+
+<a href="images/screenshots/screenshot-desktop-1.png"><img src="images/screenshots/screenshot-desktop-1.png" alt="Indent visual width ${String(WIDE_TAB_SIZE)}, and Tab still inserts ${String(OBSIDIAN_HARDCODED_TAB_SIZE)} spaces" width="600"></a>
+
+<details>
+<summary>More screenshots</summary>
+
+<a href="images/screenshots/screenshot-desktop-2.png"><img src="images/screenshots/screenshot-desktop-2.png" alt="With the plugin: Tab inserts the ${String(WIDE_TAB_SIZE)} you asked for" width="600"></a>
+<a href="images/screenshots/screenshot-desktop-3.png"><img src="images/screenshots/screenshot-desktop-3.png" alt="Set ${String(NARROW_TAB_SIZE)}, and Tab inserts ${String(NARROW_TAB_SIZE)}" width="600"></a>
+<a href="images/screenshots/screenshot-mobile-1.png"><img src="images/screenshots/screenshot-mobile-1.png" alt="Indent visual width ${String(WIDE_TAB_SIZE)}, and indenting still adds ${String(OBSIDIAN_HARDCODED_TAB_SIZE)} spaces" width="270"></a>
+<a href="images/screenshots/screenshot-mobile-2.png"><img src="images/screenshots/screenshot-mobile-2.png" alt="With the plugin: indenting adds the ${String(WIDE_TAB_SIZE)} you asked for" width="270"></a>
+<a href="images/screenshots/screenshot-mobile-3.png"><img src="images/screenshots/screenshot-mobile-3.png" alt="Set ${String(NARROW_TAB_SIZE)}, and indenting adds ${String(NARROW_TAB_SIZE)}" width="270"></a>
+
+</details>
+
+<!-- markdownlint-enable MD033 -->
+
 ## Demo vault
 
 **The documentation is a demo vault.** The feature has a note that explains what it does and why you
