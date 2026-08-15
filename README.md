@@ -18,16 +18,16 @@ Reported on the [forum](https://forum.obsidian.md/t/customizing-universal-tab-si
 
 <!-- markdownlint-disable MD033 -->
 
-<a href="images/screenshots/screenshot-desktop-1.png"><img src="images/screenshots/screenshot-desktop-1.png" alt="Indent visual width ${String(WIDE_TAB_SIZE)}, and Tab still inserts ${String(OBSIDIAN_HARDCODED_TAB_SIZE)} spaces" width="600"></a>
+<a href="images/screenshots/screenshot-desktop-1.png"><img src="images/screenshots/screenshot-desktop-1.png" alt="Indent visual width 8, and Tab still inserts 4 spaces" width="600"></a>
 
 <details>
 <summary>More screenshots</summary>
 
-<a href="images/screenshots/screenshot-desktop-2.png"><img src="images/screenshots/screenshot-desktop-2.png" alt="With the plugin: Tab inserts the ${String(WIDE_TAB_SIZE)} you asked for" width="600"></a>
-<a href="images/screenshots/screenshot-desktop-3.png"><img src="images/screenshots/screenshot-desktop-3.png" alt="Set ${String(NARROW_TAB_SIZE)}, and Tab inserts ${String(NARROW_TAB_SIZE)}" width="600"></a>
-<a href="images/screenshots/screenshot-mobile-1.png"><img src="images/screenshots/screenshot-mobile-1.png" alt="Indent visual width ${String(WIDE_TAB_SIZE)}, and indenting still adds ${String(OBSIDIAN_HARDCODED_TAB_SIZE)} spaces" width="270"></a>
-<a href="images/screenshots/screenshot-mobile-2.png"><img src="images/screenshots/screenshot-mobile-2.png" alt="With the plugin: indenting adds the ${String(WIDE_TAB_SIZE)} you asked for" width="270"></a>
-<a href="images/screenshots/screenshot-mobile-3.png"><img src="images/screenshots/screenshot-mobile-3.png" alt="Set ${String(NARROW_TAB_SIZE)}, and indenting adds ${String(NARROW_TAB_SIZE)}" width="270"></a>
+<a href="images/screenshots/screenshot-desktop-2.png"><img src="images/screenshots/screenshot-desktop-2.png" alt="With the plugin: Tab inserts the 8 you asked for" width="600"></a>
+<a href="images/screenshots/screenshot-desktop-3.png"><img src="images/screenshots/screenshot-desktop-3.png" alt="Set 2, and Tab inserts 2" width="600"></a>
+<a href="images/screenshots/screenshot-mobile-1.png"><img src="images/screenshots/screenshot-mobile-1.png" alt="Indent visual width 8, and indenting still adds 4 spaces" width="270"></a>
+<a href="images/screenshots/screenshot-mobile-2.png"><img src="images/screenshots/screenshot-mobile-2.png" alt="With the plugin: indenting adds the 8 you asked for" width="270"></a>
+<a href="images/screenshots/screenshot-mobile-3.png"><img src="images/screenshots/screenshot-mobile-3.png" alt="Set 2, and indenting adds 2" width="270"></a>
 
 </details>
 
