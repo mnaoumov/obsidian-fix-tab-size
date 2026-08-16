@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Fix Tab Size is an Obsidian plugin that fixes the editor's tab size according to the vault's settings, overriding Obsidian's hardcoded 4-space tab width when "Use tabs" is off and a different tab size is configured. It is built on `obsidian-dev-utils`.
+Fix Tab Size is an Obsidian plugin that makes one indent insert as many spaces as the vault's **Indent visual width** (`tabSize`), replacing the four-space indent unit Obsidian hardcodes on its spaces branch. It acts only while **Indent using tabs** (`useTab`) is off; with tabs on Obsidian already draws a tab at the configured width, so the plugin is inert by design. It is built on `obsidian-dev-utils`.
 
 ## Commands
 

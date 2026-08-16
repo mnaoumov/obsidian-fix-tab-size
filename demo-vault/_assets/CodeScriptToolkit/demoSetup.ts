@@ -3,8 +3,8 @@ import type { App } from 'obsidian';
 import { Notice } from 'obsidian';
 
 // This plugin has no settings of its own — it reacts to two of Obsidian's core editor settings, and
-// It only does anything while `useTab` is FALSE. Both facts are easy to get wrong by hand, which is
-// Why the buttons set them in pairs rather than one at a time.
+// it only does anything while `useTab` is FALSE. Both facts are easy to get wrong by hand, which is
+// why the buttons set them in pairs rather than one at a time.
 
 const DEFAULT_TAB_SIZE = 4;
 
