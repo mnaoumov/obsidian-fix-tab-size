@@ -1,7 +1,7 @@
 {
   "name": "fix-tab-size",
   "version": "1.2.18",
-  "description": "Fixes tab size according to the settings.",
+  "description": "Makes one indent insert as many spaces as your configured Indent visual width, instead of a hardcoded four.",
   "keywords": [],
   "homepage": "https://github.com/mnaoumov/obsidian-fix-tab-size#readme",
   "bugs": "https://github.com/mnaoumov/obsidian-fix-tab-size/issues",
