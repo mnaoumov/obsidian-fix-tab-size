@@ -19,14 +19,14 @@ Manual equivalent: turn OFF **Settings -> Editor -> Indent using tabs**, and set
 
 1. Put your cursor on the blank line below and press `Tab`.
 2. Count the spaces it inserted: **eight**, matching the setting. With the plugin disabled it would be four, whatever the width says.
-3. Try a different width and press `Tab` again:
+3. Try a different width and press `Tab` again, using the button below.
 
-   ```code-button
-   ---
-   caption: Indent with 2 spaces
-   ---
-   require('/demoSetup.ts').useSpaceIndent(app, 2);
-   ```
+```code-button
+---
+caption: Indent with 2 spaces
+---
+require('/demoSetup.ts').useSpaceIndent(app, 2);
+```
 
 ## Where the plugin does nothing, on purpose
 
