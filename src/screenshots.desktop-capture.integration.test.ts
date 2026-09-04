@@ -277,7 +277,7 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
       for (let lineIndex = 1; lineIndex <= LINE_COUNT; lineIndex++) {
         editor.focus();
         editor.setCursor(editor.lastLine(), editor.getLine(editor.lastLine()).length);
-        pressKey({ key: 'Enter' });
+        await pressKey({ key: 'Enter' });
         await sleep(KEY_SETTLE_DELAY_IN_MILLISECONDS);
 
         // Obsidian carries the previous line's indent onto the new one, so
@@ -289,7 +289,7 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
         // One press for the first line, two for the second: a single level can
         // Be read as a coincidence, two show the width compounding.
         for (let press = 0; press < lineIndex; press++) {
-          pressKey({ key: 'Tab' });
+          await pressKey({ key: 'Tab' });
           await sleep(KEY_SETTLE_DELAY_IN_MILLISECONDS);
         }
 
