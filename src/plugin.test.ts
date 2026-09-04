@@ -17,14 +17,6 @@ import {
   vi
 } from 'vitest';
 
-interface AppWithPlugins {
-  plugins: PluginRegistryLike;
-}
-
-interface PluginRegistryLike {
-  getPlugin(this: void, id: string): unknown;
-}
-
 const manifest: PluginManifest = {
   author: 'Test Author',
   description: 'Fixes the tab size.',
@@ -69,9 +61,6 @@ describe('Plugin', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     appMock = App.createConfigured__();
-    // Since obsidian-dev-utils 89.0.0 the base bridges its command handlers into Notebook Navigator's
-    // Menus, which looks the plugin up on layout-ready -- so `plugins` has to answer on the strict mock.
-    castTo<AppWithPlugins>(appMock).plugins = { getPlugin: vi.fn().mockReturnValue(null) };
     appMock.workspace.onLayoutReady = vi.fn((callback: () => void) => {
       callback();
     });
