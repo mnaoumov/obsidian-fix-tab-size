@@ -36,7 +36,7 @@ Reported on the [forum](https://forum.obsidian.md/t/customizing-universal-tab-si
 A copy of the vault ships with every release. You can access it via any of the following:
 
 1. Running the **Fix Tab Size: Open demo vault** command.
-2. Downloading `fix-tab-size-demo-vault-<version>.zip` (`<version>` is the release version) from the [Releases](https://github.com/mnaoumov/obsidian-fix-tab-size/releases).
+2. Downloading `fix-tab-size-demo-vault.zip` from the [Releases](https://github.com/mnaoumov/obsidian-fix-tab-size/releases). It unzips into a single `fix-tab-size-demo-vault-<version>` folder.
 3. Browsing its source in [`demo-vault/`](./demo-vault/README.md) in this repository.
 
 ## What it does
