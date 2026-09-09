@@ -23,6 +23,7 @@ Fix Tab Size is an Obsidian plugin that makes one indent insert as many spaces a
 | Unit tests        | `npm test`                 |
 | Coverage          | `npm run test:coverage`    |
 | Integration tests | `npm run test:integration` |
+| Branch gate       | `npm run gate`             |
 | Commit (wizard)   | `npm run commit`           |
 
 ## Architecture
