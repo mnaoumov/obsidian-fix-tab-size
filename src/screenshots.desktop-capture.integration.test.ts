@@ -112,7 +112,7 @@ beforeAll(async () => {
       });
 
       // The indentation is the subject; the file explorer and an empty right
-      // Dock would otherwise take a third of a 1200x800 frame.
+      // dock would otherwise take a third of a 1200x800 frame.
       app.workspace.leftSplit.collapse();
       const rightSplit: unknown = app.workspace.rightSplit;
       (rightSplit as ResizableSideDock).setSize(0);
@@ -120,7 +120,7 @@ beforeAll(async () => {
 
       // `Tab` has to insert SPACES for any of this to be visible — with
       // `Indent using tabs` on it inserts one tab character and the question
-      // Never arises.
+      // never arises.
       app.vault.setConfig('useTab', false);
 
       // The note opens with its own `# H1`, so the inline title doubles it.
@@ -138,8 +138,8 @@ beforeAll(async () => {
 describe('desktop store screenshots', () => {
   it('1 - Tab ignoring the setting, with the plugin off', async () => {
     // A before-shot is only safe BECAUSE of the caption. A listing carousel
-    // Shows screenshots one at a time, so an unlabelled one reads as a picture
-    // Of what the plugin does, not of what it fixes.
+    // shows screenshots one at a time, so an unlabelled one reads as a picture
+    // of what the plugin does, not of what it fixes.
     await setPluginEnabled(false);
     const indents = await typeIndentedLines(WIDE_TAB_SIZE);
     expect(indents).toStrictEqual([OBSIDIAN_HARDCODED_TAB_SIZE, OBSIDIAN_HARDCODED_TAB_SIZE * 2]);
@@ -155,7 +155,7 @@ describe('desktop store screenshots', () => {
 
   it('3 - the same at a narrow width', async () => {
     // The second width is what shows the SETTING is being read, rather than one
-    // Hardcoded number having been swapped for another.
+    // hardcoded number having been swapped for another.
     const indents = await typeIndentedLines(NARROW_TAB_SIZE);
     expect(indents).toStrictEqual([NARROW_TAB_SIZE, NARROW_TAB_SIZE * 2]);
     await shoot(3, `Set ${String(NARROW_TAB_SIZE)}, and Tab inserts ${String(NARROW_TAB_SIZE)}`);
@@ -190,8 +190,8 @@ async function setPluginEnabled(isEnabled: boolean): Promise<void> {
 
       // Enabling is not enough on its own. The plugin installs its patch when a
       // `layout-change` fires and then guards against doing it twice, so a
-      // Plugin re-enabled mid-session sits there unpatched and behaves exactly
-      // Like the disabled one — which is what made all three frames identical.
+      // plugin re-enabled mid-session sits there unpatched and behaves exactly
+      // like the disabled one — which is what made all three frames identical.
       app.workspace.trigger('layout-change');
 
       await sleep(SETTLE_DELAY_IN_MILLISECONDS);
@@ -244,8 +244,8 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
       const LINE_COUNT = 2;
 
       // Let the previous shot's capture settle. `captureObsidianScreenshot`
-      // Overrides the device metrics and clears them again, and the re-layout
-      // That lands afterwards disturbs an editor being typed into.
+      // overrides the device metrics and clears them again, and the re-layout
+      // that lands afterwards disturbs an editor being typed into.
       await sleep(RESIZE_SETTLE_DELAY_IN_MILLISECONDS);
 
       app.vault.setConfig('tabSize', size);
@@ -256,13 +256,13 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
       }
 
       // Back to the base note, so each shot types into the same blank slate
-      // Rather than onto the lines the previous shot left behind.
+      // rather than onto the lines the previous shot left behind.
       await app.vault.modify(file, '# Typing with Tab\n\ntop level\n');
 
       const leaf = app.workspace.getLeaf(false);
       await leaf.openFile(file);
       // `source: true` forces RAW markdown, which is where indentation is the
-      // Thing on screen rather than something the renderer has swallowed.
+      // thing on screen rather than something the renderer has swallowed.
       await leaf.setViewState({
         state: { file: subjectNotePath, mode: 'source', source: true },
         type: 'markdown'
@@ -287,13 +287,13 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
         await sleep(KEY_SETTLE_DELAY_IN_MILLISECONDS);
 
         // Obsidian carries the previous line's indent onto the new one, so
-        // Without this the second line measures its own two presses PLUS the
-        // First line's indent and the numbers stop meaning what they say.
+        // without this the second line measures its own two presses PLUS the
+        // first line's indent and the numbers stop meaning what they say.
         editor.setLine(editor.lastLine(), '');
         editor.setCursor(editor.lastLine(), 0);
 
         // One press for the first line, two for the second: a single level can
-        // Be read as a coincidence, two show the width compounding.
+        // be read as a coincidence, two show the width compounding.
         for (let press = 0; press < lineIndex; press++) {
           await pressKey({ key: 'Tab' });
           await sleep(KEY_SETTLE_DELAY_IN_MILLISECONDS);
@@ -305,7 +305,7 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
       await sleep(SETTLE_DELAY_IN_MILLISECONDS);
 
       // Counted from the EDITOR rather than the file: the file is only written
-      // On save, and the frame is of what is on screen.
+      // on save, and the frame is of what is on screen.
       const indents: number[] = [];
       for (let lineIndex = 1; lineIndex <= LINE_COUNT; lineIndex++) {
         const line = editor.getLine(editor.lastLine() - LINE_COUNT + lineIndex);
