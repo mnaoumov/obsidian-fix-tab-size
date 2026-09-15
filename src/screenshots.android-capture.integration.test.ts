@@ -97,8 +97,8 @@ beforeAll(async () => {
   setupDiagnostics = await evalInObsidian({
     async callback({ app, fontSizeInPixels, lib: { waitUntil }, subjectNotePath }) {
       // A closure runs inside ONE Appium `execute/sync` call, which WebDriver
-      // Caps around 30s. A longer wait in here dies as an opaque `script
-      // Timeout` rather than a readable failure, so keep every wait under it.
+      // caps around 30s. A longer wait in here dies as an opaque `script
+      // timeout` rather than a readable failure, so keep every wait under it.
       const SETTLE_TIMEOUT_IN_MILLISECONDS = 20_000;
       const SETTLE_DELAY_IN_MILLISECONDS = 1500;
 
@@ -111,8 +111,8 @@ beforeAll(async () => {
       });
 
       // The indent has to be made of SPACES for any of this to be visible —
-      // With `Indent using tabs` on it inserts one tab character and the
-      // Question never arises.
+      // with `Indent using tabs` on it inserts one tab character and the
+      // question never arises.
       app.vault.setConfig('useTab', false);
 
       app.vault.setConfig('baseFontSize', fontSizeInPixels);
@@ -135,8 +135,8 @@ beforeAll(async () => {
 describe('mobile store screenshots', () => {
   it('stages the note the shots are framed on', () => {
     // Surfaced as an assertion because vitest swallows console output from an
-    // Integration worker, and a silently-wrong layout produces bad images
-    // Without a single failure.
+    // integration worker, and a silently-wrong layout produces bad images
+    // without a single failure.
     expect(setupDiagnostics).toMatchObject({ isNoteStaged: true });
   });
 
@@ -189,8 +189,8 @@ async function setPluginEnabled(isEnabled: boolean): Promise<void> {
 
       // Enabling is not enough on its own. The plugin installs its patch when a
       // `layout-change` fires and then guards against doing it twice, so a
-      // Plugin re-enabled mid-session sits there unpatched and behaves exactly
-      // Like the disabled one.
+      // plugin re-enabled mid-session sits there unpatched and behaves exactly
+      // like the disabled one.
       app.workspace.trigger('layout-change');
 
       await sleep(SETTLE_DELAY_IN_MILLISECONDS);
@@ -211,15 +211,15 @@ async function shoot(index: number, caption: string): Promise<void> {
   const captured = await captureObsidianScreenshot({ vaultPath: vaultPath() });
 
   // The AVD is 900x1600, so the device frame IS the store's size. Asserting it
-  // Here is what keeps that true: run this against any other AVD and it fails
-  // Loudly instead of quietly shipping an off-spec image.
+  // here is what keeps that true: run this against any other AVD and it fails
+  // loudly instead of quietly shipping an off-spec image.
   expect(readPngDimensions(captured)).toStrictEqual({
     heightInPixels: HEIGHT_IN_PIXELS,
     widthInPixels: WIDTH_IN_PIXELS
   });
 
   // Captioned AFTER capture, so the frame stays an untouched device screenshot
-  // And rewording a label needs no re-shoot.
+  // and rewording a label needs no re-shoot.
   const labeled = await labelScreenshot(captured, { text: caption });
 
   mkdirSync(IMAGES_DIRECTORY, { recursive: true });
@@ -250,13 +250,13 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
       }
 
       // Back to the base note, so each shot writes into the same blank slate
-      // Rather than onto the lines the previous shot left behind.
+      // rather than onto the lines the previous shot left behind.
       await app.vault.modify(file, '# Typing with Tab\n\ntop level\n');
 
       const leaf = app.workspace.getLeaf(false);
       await leaf.openFile(file);
       // `source: true` forces RAW markdown, which is where indentation is the
-      // Thing on screen rather than something the renderer has swallowed.
+      // thing on screen rather than something the renderer has swallowed.
       await leaf.setViewState({
         state: { file: subjectNotePath, mode: 'source', source: true },
         type: 'markdown'
@@ -280,8 +280,8 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
         editor.setCursor(editor.lastLine(), 0);
 
         // What the mobile toolbar's indent button runs. One level for the first
-        // Line, two for the second: a single level can be read as a
-        // Coincidence, two show the width compounding.
+        // line, two for the second: a single level can be read as a
+        // coincidence, two show the width compounding.
         for (let press = 0; press < lineIndex; press++) {
           editor.exec('indentMore');
           await sleep(STEP_SETTLE_DELAY_IN_MILLISECONDS);
