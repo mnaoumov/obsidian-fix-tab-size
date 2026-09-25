@@ -288,23 +288,16 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
         }
       }
 
-      // The editor stays focused, so its caret blinks, and whether a capture
-      // lands on the lit or the dark phase decided 60 pixels of the frame. The
-      // caret CodeMirror draws lives in `.cm-cursorLayer`; the native one it
-      // masks is made transparent as well. Not a blur: on mobile that drops the
-      // editing toolbar, which is part of what the frames show.
-      for (const cursorLayer of view.containerEl.findAll('.cm-cursorLayer')) {
-        cursorLayer.setCssStyles({ visibility: 'hidden' });
-      }
-      for (const content of view.containerEl.findAll('.cm-content')) {
-        content.setCssStyles({ caretColor: 'transparent' });
-      }
+      // The editor stays focused, so its caret blinks; `captureObsidianScreenshot`
+      // hides the focused element's caret for the frame. Not a blur: on mobile
+      // that drops the editing toolbar, which is part of what the frames show.
 
       // The WebView can leave the line holding the cursor painted wrong: at two
       // spaces per level, "level 2" came out a fraction of the body size and
       // clipped, while its layout box was a normal 13px line. Neither waiting
-      // nor a forced relayout repaints it; moving the cursor off the line does.
-      // The caret is hidden, so where the cursor ends up is not visible.
+      // nor forcing a layout repaints it; moving the cursor off the line does.
+      // The caret is hidden at capture, so where the cursor ends up is not
+      // visible.
       editor.setCursor(editor.lastLine() - 1, 0);
       await sleep(STEP_SETTLE_DELAY_IN_MILLISECONDS);
       editor.setCursor(editor.lastLine(), editor.getLine(editor.lastLine()).length);
