@@ -288,6 +288,18 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
         }
       }
 
+      // The editor stays focused, so its caret blinks, and whether a capture
+      // lands on the lit or the dark phase decided 60 pixels of the frame. The
+      // caret CodeMirror draws lives in `.cm-cursorLayer`; the native one it
+      // masks is made transparent as well. Not a blur: on mobile that drops the
+      // editing toolbar, which is part of what the frames show.
+      for (const cursorLayer of view.containerEl.findAll('.cm-cursorLayer')) {
+        cursorLayer.setCssStyles({ visibility: 'hidden' });
+      }
+      for (const content of view.containerEl.findAll('.cm-content')) {
+        content.setCssStyles({ caretColor: 'transparent' });
+      }
+
       await sleep(SETTLE_DELAY_IN_MILLISECONDS);
 
       const indents: number[] = [];
