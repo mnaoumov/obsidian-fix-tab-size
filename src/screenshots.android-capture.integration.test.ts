@@ -300,6 +300,15 @@ async function typeIndentedLines(tabSize: number): Promise<number[]> {
         content.setCssStyles({ caretColor: 'transparent' });
       }
 
+      // The WebView can leave the line holding the cursor painted wrong: at two
+      // spaces per level, "level 2" came out a fraction of the body size and
+      // clipped, while its layout box was a normal 13px line. Neither waiting
+      // nor a forced relayout repaints it; moving the cursor off the line does.
+      // The caret is hidden, so where the cursor ends up is not visible.
+      editor.setCursor(editor.lastLine() - 1, 0);
+      await sleep(STEP_SETTLE_DELAY_IN_MILLISECONDS);
+      editor.setCursor(editor.lastLine(), editor.getLine(editor.lastLine()).length);
+
       await sleep(SETTLE_DELAY_IN_MILLISECONDS);
 
       const indents: number[] = [];
