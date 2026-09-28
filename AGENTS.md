@@ -35,3 +35,7 @@ Fix Tab Size is an Obsidian plugin that makes one indent insert as many spaces a
   - `fix-tab-size-component.ts` — `FixTabSizeComponent` extends `ComponentEx`; listens for the `layout-change` workspace event and, once a `MarkdownView` exists, installs the patch component (one-shot via `isPatched`) and calls `editMode.updateOptions()` on all markdown views.
   - `patches/markdown-edit-view-get-dynamic-extensions-patch-component.ts` — `MarkdownEditViewGetDynamicExtensionsPatchComponent` extends `MonkeyAroundComponent`; monkey-patches `getDynamicExtensions` on the markdown edit view prototype to replace the hardcoded 4-space tab extension with the vault's configured `tabSize` (when `useTab` is off).
 - **`main` field** points to `src/main.ts` (Obsidian plugin source entry; built artifact is `dist/build/main.js`, not published to npm).
+
+## Screenshots
+
+`npm run capture:screenshots` writes the store listing's frames to `images/screenshots/`. The desktop suite sets the dark theme through `obsidian-integration-testing`'s `applyObsidianTheme` (>= 17.3.0), never a bare `app.changeTheme`. That one only schedules the config save, and a config reload landing first drops the theme, so every frame can come out light and overwrite the committed ones. `applyObsidianTheme` saves at once, and `captureObsidianScreenshot` then refuses a frame that has left the theme. The Android suite does not need it: no host watcher feeds config events on a device.
