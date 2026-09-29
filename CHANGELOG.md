@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## 1.2.21
+
+- test(screenshots): merge the move onto applyObsidianTheme
+- test(screenshots): merge dropping the local mobile caret hiding
+- test(screenshots): merge the mobile frame 3 repaint fix
+- test(screenshots): merge the mobile caret hiding and frame 3 re-shoot
+- chore(deps): merge the obsidian-integration-testing 17 float and screenshot re-shoot
+- chore(deps): merge the obsidian-test-mocks 7 raise
+- fix(test): merge the headless demo-vault toolkit install
+- fix(deps): restore the lockfile's missing resolved and integrity fields
+- fix(deps): float devalue to 5.9.4, clearing GHSA-9rgm-9g3h-6x36
+- build(markdownlint): forbid hard-wrapped markdown paragraphs
+- chore(deps): drop the two dead dedupe overrides
+- chore(deps): drop the dead markdown-it override
+- chore(deps): drop the dead js-yaml override
+- style(comments): stop capitalizing the middle of a wrapped comment
+- docs: drop the rule-id citations from the pin table
+- docs(changelog): name obsidian-dev-utils by its package name
+- docs: replace the private tracker references with what they pointed at
+- chore(deps): move to obsidian-dev-utils 103
+- chore: adopt the npm run gate branch gate
+- docs: say where the debug command is run
+- test: bring the in-closure wait ceiling under the transport's per-eval cap
+- docs: name the unversioned demo-vault asset and the folder it unzips into
+- chore: make the LICENSE copyright line checkable by the linter and guard it against the year roll-over
+- test(test-mocks): await the trusted-input helpers, and drop the app.plugins stub
+- fix(build): wire build:compile to buildCompile and drop the duplicate leaf script
+
 ## 1.2.20
 
 - chore(deps): sweep caret-ranged dependencies to latest
