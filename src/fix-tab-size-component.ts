@@ -1,8 +1,8 @@
 import type { App } from 'obsidian';
 
+import { ComponentEx } from '@mnaoumov/obsidian-lib/components/component-ex';
 import { ViewType } from '@obsidian-typings/obsidian-public-latest/implementations';
 import { MarkdownView } from 'obsidian';
-import { ComponentEx } from 'obsidian-dev-utils/obsidian/components/component-ex';
 
 import { MarkdownEditViewGetDynamicExtensionsPatchComponent } from './patches/markdown-edit-view-get-dynamic-extensions-patch-component.ts';
 

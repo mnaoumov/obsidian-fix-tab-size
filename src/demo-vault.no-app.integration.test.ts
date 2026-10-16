@@ -1,6 +1,6 @@
+import { registerDemoVaultCoverageSuite } from '@mnaoumov/obsidian-dev-toolkit/demo-vault-coverage';
+import { getRootFolder } from '@mnaoumov/typescript-dev-toolkit/root';
 import process from 'node:process';
-import { registerDemoVaultCoverageSuite } from 'obsidian-dev-utils/script-utils/demo-vault-coverage';
-import { getRootFolder } from 'obsidian-dev-utils/script-utils/root';
 
 // Keeps the in-repo `demo-vault/` honest WITHOUT launching Obsidian. `Fix Tab Size` has no settings and
 // no public API interface — it patches the editor's dynamic extensions and nothing else — so there is

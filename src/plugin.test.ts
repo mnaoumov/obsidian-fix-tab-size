@@ -3,7 +3,7 @@ import type {
   PluginManifest
 } from 'obsidian';
 
-import { castTo } from 'obsidian-dev-utils/object-utils';
+import { castTo } from '@mnaoumov/typescript-lib/object-utils';
 import {
   App,
   Component
@@ -25,16 +25,6 @@ const manifest: PluginManifest = {
   name: 'Fix Tab Size',
   version: '1.2.9'
 };
-
-// Stub the one dev-utils utility that the real PluginBase.onload() reads off the app.
-// The strict mock App lacks the shared-state bag, so return a value-wrapper double.
-vi.mock('obsidian-dev-utils/obsidian/app', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('obsidian-dev-utils/obsidian/app')>();
-  return {
-    ...actual,
-    getObsidianDevUtilsState: vi.fn((_app: AppOriginal | null, _key: string, defaultValue: unknown) => ({ value: defaultValue }))
-  };
-});
 
 // Replace the child component with a real (empty) Component so addChild's load contract holds.
 // Recording the constructor call lets the delegation to FixTabSizeComponent be asserted.

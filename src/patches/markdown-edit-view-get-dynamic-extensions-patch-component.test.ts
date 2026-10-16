@@ -5,7 +5,7 @@ import type {
 } from 'obsidian';
 import type { MockInstance } from 'vitest';
 
-import { castTo } from 'obsidian-dev-utils/object-utils';
+import { castTo } from '@mnaoumov/typescript-lib/object-utils';
 import { App } from 'obsidian-test-mocks/obsidian';
 import {
   afterEach,
