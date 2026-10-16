@@ -1,6 +1,6 @@
 # Fix tab size
 
-Obsidian has an **Indent visual width** setting (**Settings -> Editor -> Indent visual width**), and it honours it for real tab characters. What it ignores it for is **spaces**: with **Indent using tabs** turned off, one level of indent is always **four** spaces, whatever width you configured. **Fix Tab Size** makes the space indent match the width you set.
+Obsidian has an **Indent visual width** setting (**Settings -> Editor -> Indent visual width**), and it honours it for real tab characters. What it ignores it for is **spaces**: with **Indent using tabs** turned off, one level of indent is always **four** spaces, whatever width you configured. `Fix Tab Size` makes the space indent match the width you set.
 
 ![Obsidian's Indent visual width setting](<./_assets/images/tab-size.png>)
 
