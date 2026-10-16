@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.2.22
+
+- build(deps): merge moving off obsidian-dev-utils onto the @mnaoumov packages
+- docs: merge marking plugin names as code in docs and comments
+- refactor: merge reading tabSize through the keyed getConfig overload
+- test: merge using the obsidian-typings declarations of Obsidian internals
+
 ## 1.2.21
 
 - test(screenshots): merge the move onto applyObsidianTheme
