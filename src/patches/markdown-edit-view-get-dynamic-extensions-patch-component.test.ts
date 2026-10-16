@@ -3,6 +3,7 @@ import type {
   App as AppOriginal,
   MarkdownEditView
 } from 'obsidian';
+import type { MockInstance } from 'vitest';
 
 import { castTo } from 'obsidian-dev-utils/object-utils';
 import { App } from 'obsidian-test-mocks/obsidian';
@@ -30,17 +31,13 @@ interface ExtensionWithValue {
   value: string;
 }
 
-interface GetConfigHolder {
-  getConfig: ReturnType<typeof vi.fn>;
-}
-
 const HARDCODED_TAB_SIZE = 4;
 const DIFFERENT_TAB_SIZE = 2;
 
 describe('MarkdownEditViewGetDynamicExtensionsPatchComponent', () => {
   let appMock: App;
   let app: AppOriginal;
-  let getConfig: ReturnType<typeof vi.fn>;
+  let getConfig: MockInstance<(key: string) => unknown>;
   let editMode: MarkdownEditView;
   let nextExtensions: ExtensionsHolder;
   const loadedComponents: MarkdownEditViewGetDynamicExtensionsPatchComponent[] = [];
@@ -48,8 +45,7 @@ describe('MarkdownEditViewGetDynamicExtensionsPatchComponent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     appMock = App.createConfigured__();
-    getConfig = vi.fn();
-    castTo<GetConfigHolder>(appMock.vault).getConfig = getConfig;
+    getConfig = vi.spyOn(appMock.vault, 'getConfig');
     app = appMock.asOriginalType__();
 
     const context = createEditMode();
@@ -77,6 +73,16 @@ describe('MarkdownEditViewGetDynamicExtensionsPatchComponent', () => {
   it('should not modify extensions when tabSize equals the hardcoded value', () => {
     loadComponent();
     getConfig.mockImplementation((key: string) => key === 'tabSize' && HARDCODED_TAB_SIZE);
+    nextExtensions.value = makeExtensions(' '.repeat(4));
+
+    const result = editMode.getDynamicExtensions();
+
+    expect(extensionValue(result[0])).toBe(' '.repeat(4));
+  });
+
+  it('should not modify extensions when tabSize is unset', () => {
+    loadComponent();
+    getConfig.mockReturnValue(undefined);
     nextExtensions.value = makeExtensions(' '.repeat(4));
 
     const result = editMode.getDynamicExtensions();

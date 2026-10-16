@@ -39,7 +39,7 @@ export class MarkdownEditViewGetDynamicExtensionsPatchComponent extends MonkeyAr
         const extensions = fallback();
 
         if (!this.app.vault.getConfig('useTab')) {
-          const tabSize = this.app.vault.getConfig('tabSize') as number;
+          const tabSize = this.app.vault.getConfig('tabSize') ?? HARDCODED_TAB_SIZE;
           if (tabSize !== HARDCODED_TAB_SIZE) {
             const tabSizeExtension = extensions.find((extension: Extension) => (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)) as
               | ExtensionWithValue
