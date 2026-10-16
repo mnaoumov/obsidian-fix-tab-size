@@ -5,16 +5,16 @@ import {
   vi
 } from 'vitest';
 
-vi.mock('obsidian-dev-utils/obsidian/plugin/plugin', () => ({
+vi.mock('@mnaoumov/obsidian-lib/plugin/plugin', () => ({
   PluginBase: vi.fn()
 }));
 
-vi.mock('obsidian-dev-utils/object-utils', () => ({
+vi.mock('@mnaoumov/typescript-lib/object-utils', () => ({
   castTo: vi.fn(),
   getPrototypeOf: vi.fn()
 }));
 
-vi.mock('obsidian-dev-utils/obsidian/components/monkey-around-component', () => ({
+vi.mock('@mnaoumov/obsidian-lib/components/monkey-around-component', () => ({
   MonkeyAroundComponent: vi.fn()
 }));
 
