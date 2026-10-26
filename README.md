@@ -43,6 +43,13 @@ A copy of the vault ships with every release. You can access it via any of the f
 
 - **A space indent is as wide as you configured**, matching `Indent visual width` instead of Obsidian's hardcoded four. Applies while `Indent using tabs` is off; there is nothing to configure in the plugin itself. [01 Fix tab size](<./demo-vault/01 Fix tab size.md>)
 
+## Similar plugins
+
+- [`Indent with Spaces`](https://community.obsidian.md/plugins/two-space-indent) — takes over `Tab` and `Shift+Tab` with its own handler and its own spaces-per-indent setting, and adds table-cell navigation; this plugin has no setting and no key handler, it makes Obsidian's own indent follow `Indent visual width`.
+- [`Simple Tab Indent`](https://community.obsidian.md/plugins/simple-tab-indent) — inserts a zero-width space and a real tab character, rendered at its own width setting, so the line is not read as a code block; this plugin keeps space indentation and changes only how many spaces one indent adds.
+
+Last searched for similar plugins on 2026-10-26.
+
 ## Installation
 
 The plugin is available in [the official Community Plugins repository](https://community.obsidian.md/plugins/fix-tab-size).
