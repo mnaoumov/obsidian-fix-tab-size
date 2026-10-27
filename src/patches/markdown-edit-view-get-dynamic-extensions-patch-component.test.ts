@@ -19,16 +19,17 @@ import {
 import { MarkdownEditViewGetDynamicExtensionsPatchComponent } from './markdown-edit-view-get-dynamic-extensions-patch-component.ts';
 
 interface EditModeContext {
-  editMode: MarkdownEditView;
-  nextExtensions: ExtensionsHolder;
+  readonly editMode: MarkdownEditView;
+  readonly nextExtensions: ExtensionsHolder;
 }
 
 interface ExtensionsHolder {
+  // eslint-disable-next-line typescript-dev-toolkit/readonly-interface-members -- Each test replaces the extensions returned by the fake editor.
   value: Extension[];
 }
 
 interface ExtensionWithValue {
-  value: string;
+  readonly value: string;
 }
 
 const HARDCODED_TAB_SIZE = 4;

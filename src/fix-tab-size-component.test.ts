@@ -22,11 +22,12 @@ import {
 import { FixTabSizeComponent } from './fix-tab-size-component.ts';
 
 interface EditModeContext {
-  editMode: MarkdownEditView;
-  updateOptions: ReturnType<typeof vi.fn>;
+  readonly editMode: MarkdownEditView;
+  readonly updateOptions: ReturnType<typeof vi.fn>;
 }
 
 interface EditModeHolder {
+  // eslint-disable-next-line typescript-dev-toolkit/readonly-interface-members -- The fixture attaches its edit mode after constructing the view prototype.
   editMode: MarkdownEditView;
 }
 
