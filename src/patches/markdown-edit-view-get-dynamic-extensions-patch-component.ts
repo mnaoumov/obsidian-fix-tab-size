@@ -8,6 +8,7 @@ import { MonkeyAroundComponent } from '@mnaoumov/obsidian-lib/components/monkey-
 import { getPrototypeOf } from '@mnaoumov/typescript-lib/object-utils';
 
 interface ExtensionValue {
+  // eslint-disable-next-line typescript-dev-toolkit/readonly-interface-members -- The patch must replace the existing indent extension's value in place.
   value: string;
 }
 
