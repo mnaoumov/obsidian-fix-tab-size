@@ -43,10 +43,14 @@ A copy of the vault ships with every release. You can access it via any of the f
 
 - **A space indent is as wide as you configured**, matching `Indent visual width` instead of Obsidian's hardcoded four. Applies while `Indent using tabs` is off; there is nothing to configure in the plugin itself. [01 Fix tab size](<./demo-vault/01 Fix tab size.md>)
 
-## Similar plugins
+## See also
 
-- [`Indent with Spaces`](https://community.obsidian.md/plugins/two-space-indent) — takes over `Tab` and `Shift+Tab` with its own handler and its own spaces-per-indent setting, and adds table-cell navigation; this plugin has no setting and no key handler, it makes Obsidian's own indent follow `Indent visual width`.
-- [`Simple Tab Indent`](https://community.obsidian.md/plugins/simple-tab-indent) — inserts a zero-width space and a real tab character, rendered at its own width setting, so the line is not read as a code block; this plugin keeps space indentation and changes only how many spaces one indent adds.
+[My other Obsidian resources](https://github.com/mnaoumov/obsidian-resources)
+
+| Plugin | Features | How `Fix Tab Size` differs |
+| --- | --- | --- |
+| [`Indent with Spaces`](https://community.obsidian.md/plugins/two-space-indent) | Own Tab/Shift+Tab handlers and indent-width setting; table navigation | Same indentation goal; uses core Indent visual width; no extra setting/key handler |
+| [`Simple Tab Indent`](https://community.obsidian.md/plugins/simple-tab-indent) | Zero-width space plus tab; own display width; avoids code-block parsing | Alternative indentation: keeps spaces; changes their count per indent |
 
 Last searched for similar plugins on 2026-10-26.
 
@@ -83,10 +87,6 @@ Contributions are welcome — see [CONTRIBUTING](./CONTRIBUTING.md) to get set u
 <a href="https://www.buymeacoffee.com/mnaoumov" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217"></a>
 
 <!-- markdownlint-enable MD033 -->
-
-## My other Obsidian resources
-
-[See my other Obsidian resources](https://github.com/mnaoumov/obsidian-resources).
 
 ## License
 
