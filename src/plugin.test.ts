@@ -85,4 +85,14 @@ describe('Plugin', () => {
 
     expect(addCommandSpy).toHaveBeenCalledWith(expect.objectContaining({ id: 'open-demo-vault' }));
   });
+
+  it('should register the report bug command', async () => {
+    const plugin = new Plugin(app, manifest);
+    const addCommandSpy = vi.spyOn(plugin, 'addCommand');
+
+    await plugin.onload();
+    loadedPlugins.push(plugin);
+
+    expect(addCommandSpy).toHaveBeenCalledWith(expect.objectContaining({ id: 'report-bug' }));
+  });
 });
