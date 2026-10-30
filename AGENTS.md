@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Filing an issue (for AI agents and humans)
+
+Open issues through the [issue forms](https://github.com/mnaoumov/obsidian-fix-tab-size/issues/new/choose), not as blank issues.
+
+Filing from the CLI or the API (`gh issue create --body`, or an AI agent filing for you) skips the form, and `gh issue create --template` cannot load an issue form. In that case, open the matching form in [`.github/ISSUE_TEMPLATE/`](https://github.com/mnaoumov/obsidian-fix-tab-size/tree/HEAD/.github/ISSUE_TEMPLATE), copy every field as a `### <label>` heading in the form's order, and fill in each one. Always state the plugin version, the Obsidian version and your operating system.
+
 ## Overview
 
 `Fix Tab Size` is an Obsidian plugin that makes one indent insert as many spaces as the vault's **Indent visual width** (`tabSize`), replacing the four-space indent unit Obsidian hardcodes on its spaces branch. It acts only while **Indent using tabs** (`useTab`) is off; with tabs on Obsidian already draws a tab at the configured width, so the plugin is inert by design. It is built on `@mnaoumov/obsidian-lib` at runtime, and on `@mnaoumov/obsidian-dev-toolkit` and `@mnaoumov/typescript-dev-toolkit` for its tooling.
