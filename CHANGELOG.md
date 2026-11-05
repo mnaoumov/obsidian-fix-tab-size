@@ -7,8 +7,8 @@
 - docs: add issue-filing instructions for AI agents
 - chore(github): give the bug form the field ids bug-report links prefill
 - build(deps): override re2js to ^2.9.1 for GHSA-gg6h-894w-4m9c
-- build(deps): bump typescript-dev-toolkit to ^5.2.0
-- build(deps): bump obsidian-dev-toolkit to ^7.1.1 and typescript-dev-toolkit to ^5.1.0
+- build(deps): bump `typescript-dev-toolkit` to ^5.2.0
+- build(deps): bump `obsidian-dev-toolkit` to ^7.1.1 and `typescript-dev-toolkit` to ^5.1.0
 - chore(deps): update vulnerable browser automation dependencies
 - chore: adopt readonly interface members
 - docs(readme): combine related resources and plugin comparisons
@@ -16,9 +16,9 @@
 
 ## 1.2.23
 
-- build(deps): move to obsidian-lib 6 and obsidian-dev-toolkit 5
+- build(deps): move to `obsidian-lib` 6 and `obsidian-dev-toolkit` 5
 - docs: shorten the debugging section
-- chore: replace leftover obsidian-dev-utils references with @mnaoumov/obsidian-lib
+- chore: replace leftover `obsidian-dev-utils` references with @mnaoumov/obsidian-lib
 - docs(readme): lead the Debugging section with `Advanced Debug Mode`
 - build(deps): float brace-expansion, sharp and fast-uri past their advisories
 - docs: mark plugin names as code
@@ -27,10 +27,10 @@
 
 ## 1.2.22
 
-- build(deps): merge moving off obsidian-dev-utils onto the @mnaoumov packages
+- build(deps): merge moving off `obsidian-dev-utils` onto the @mnaoumov packages
 - docs: merge marking plugin names as code in docs and comments
 - refactor: merge reading tabSize through the keyed getConfig overload
-- test: merge using the obsidian-typings declarations of Obsidian internals
+- test: merge using the `obsidian-typings` declarations of Obsidian internals
 
 ## 1.2.21
 
@@ -38,21 +38,21 @@
 - test(screenshots): merge dropping the local mobile caret hiding
 - test(screenshots): merge the mobile frame 3 repaint fix
 - test(screenshots): merge the mobile caret hiding and frame 3 re-shoot
-- chore(deps): merge the obsidian-integration-testing 17 float and screenshot re-shoot
-- chore(deps): merge the obsidian-test-mocks 7 raise
+- chore(deps): merge the `obsidian-integration-testing` 17 float and screenshot re-shoot
+- chore(deps): merge the `obsidian-test-mocks` 7 raise
 - fix(test): merge the headless demo-vault toolkit install
 - fix(deps): restore the lockfile's missing resolved and integrity fields
 - fix(deps): float devalue to 5.9.4, clearing GHSA-9rgm-9g3h-6x36
-- build(markdownlint): forbid hard-wrapped markdown paragraphs
+- build(`markdownlint`): forbid hard-wrapped markdown paragraphs
 - chore(deps): drop the two dead dedupe overrides
 - chore(deps): drop the dead markdown-it override
 - chore(deps): drop the dead js-yaml override
 - style(comments): stop capitalizing the middle of a wrapped comment
 - docs: drop the rule-id citations from the pin table
-- docs(changelog): name obsidian-dev-utils by its package name
+- docs(changelog): name `obsidian-dev-utils` by its package name
 - docs: replace the private tracker references with what they pointed at
-- chore(deps): move to obsidian-dev-utils 103
-- chore: adopt the npm run gate branch gate
+- chore(deps): move to `obsidian-dev-utils` 103
+- chore: adopt the `npm` run gate branch gate
 - docs: say where the debug command is run
 - test: bring the in-closure wait ceiling under the transport's per-eval cap
 - docs: name the unversioned demo-vault asset and the folder it unzips into
@@ -63,21 +63,21 @@
 ## 1.2.20
 
 - chore(deps): sweep caret-ranged dependencies to latest
-- fix(deps): move to obsidian-integration-testing 11 and obsidian-dev-utils 96.5.2
+- fix(deps): move to `obsidian-integration-testing` 11 and `obsidian-dev-utils` 96.5.2
 - fix(deps): drop the brace-expansion file: override that breaks a clean install
 
 ## 1.2.19
 
 - docs(demo-vault): unwrap the notes so Obsidian stops rendering a break per line
-- docs(readme): render the same in Obsidian's plugin page as on GitHub
+- docs(readme): render the same in Obsidian's plugin page as on `GitHub`
 - chore: update libs
-- chore: update obsidian-dev-utils to 94.6.1
-- chore: update obsidian-dev-utils to 94.6.0
+- chore: update `obsidian-dev-utils` to 94.6.1
+- chore: update `obsidian-dev-utils` to 94.6.0
 - fix: override deepmerge-ts to clear GHSA-ggr8-5vv4-36mx
 - test: gate the demo vault by clicking every code button
 - test: gate the demo vault by clicking every code button
 - docs: describe the plugin by the defect it actually fixes
-- chore: teach cspell the advisory wording
+- chore: teach `cspell` the advisory wording
 - chore: update libs
 - docs: resolve the numbers in the screenshot alt text
 - docs: correct the plugin's described behavior and add demo buttons
@@ -90,14 +90,14 @@
 
 ## 1.2.17
 
-- chore: update libs and adopt obsidian-integration-testing 10
+- chore: update libs and adopt `obsidian-integration-testing` 10
 
 ## 1.2.16
 
 - chore: update libs
 - chore: update libs
-- chore(vitest): adopt the shared Obsidian plugin vitest configuration
-- chore: update libs and clear the npm audit
+- chore(`vitest`): adopt the shared Obsidian plugin `vitest` configuration
+- chore: update libs and clear the `npm` audit
 - docs: fix the demo vault download instructions
 
 ## 1.2.15
@@ -118,7 +118,7 @@
 ## 1.2.12
 
 - docs: standardize demo-vault README
-- docs: drop per-plugin demo-vault setup notes (bootstrap covered by the obsidian-dev-utils harness)
+- docs: drop per-plugin demo-vault setup notes (bootstrap covered by the `obsidian-dev-utils` harness)
 - docs(demo-vault): create the `Fix Tab Size` demo vault
 - chore: update libs
 - docs: update
@@ -127,7 +127,7 @@
 ## 1.2.11
 
 - chore: update libs
-- chore: update obsidian-dev-utils to 85.0.0
+- chore: update `obsidian-dev-utils` to 85.0.0
 - build: lock typescript to 6.0.3
 - test: wire integration-testing vitest-setup into integration projects
 - chore: update libs
@@ -169,7 +169,7 @@
 
 - chore: update libs
 - chore: lint
-- chore: enable markdownlint
+- chore: enable `markdownlint`
 
 ## 1.2.1
 

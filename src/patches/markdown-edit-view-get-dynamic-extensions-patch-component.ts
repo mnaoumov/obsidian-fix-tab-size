@@ -12,8 +12,6 @@ interface ExtensionValue {
   value: string;
 }
 
-type ExtensionWithValue = Extension & ExtensionValue;
-
 interface MarkdownEditViewGetDynamicExtensionsPatchComponentConstructorParams {
   readonly app: App;
   readonly markdownEditView: MarkdownEditView;
@@ -42,6 +40,7 @@ export class MarkdownEditViewGetDynamicExtensionsPatchComponent extends MonkeyAr
         if (!this.app.vault.getConfig('useTab')) {
           const tabSize = this.app.vault.getConfig('tabSize') ?? HARDCODED_TAB_SIZE;
           if (tabSize !== HARDCODED_TAB_SIZE) {
+            type ExtensionWithValue = Extension & ExtensionValue;
             const tabSizeExtension = extensions.find((extension: Extension) => (extension as Partial<ExtensionWithValue>).value === ' '.repeat(HARDCODED_TAB_SIZE)) as
               | ExtensionWithValue
               | null;
