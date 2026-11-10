@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 1.3.1
+
+This release has 1 fix and 3 documentation changes. 2 maintenance commits (tests, build, CI, refactoring, dependencies) are not listed.
+
+### Fixed
+
+- clear glob cancellation advisory
+
+### Documentation
+
+- **changelog:** merge the regrouped release notes
+- make issue attachments optional and strongly encouraged
+- link to the Obsidian resources page
+
 ## 1.3.0
 
 This release has 1 new feature and 4 documentation changes. 6 maintenance commits (tests, build, CI, refactoring, dependencies) are not listed.
