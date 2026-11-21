@@ -148,8 +148,8 @@ describe('MarkdownEditViewGetDynamicExtensionsPatchComponent', () => {
   }
 });
 
-function extensionValue(extension: Extension | undefined): string | undefined {
-  return castTo<ExtensionWithValue | undefined>(extension)?.value;
+function extensionValue(extension: Extension | undefined): null | string {
+  return castTo<ExtensionWithValue | undefined>(extension)?.value ?? null;
 }
 
 function makeExtensions(value: string): Extension[] {

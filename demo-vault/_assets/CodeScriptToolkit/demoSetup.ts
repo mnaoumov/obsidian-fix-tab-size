@@ -9,6 +9,17 @@ import { Notice } from 'obsidian';
 const DEFAULT_TAB_SIZE = 4;
 
 /**
+ * Restores Obsidian's defaults: tabs, four wide.
+ *
+ * Manual equivalent: turn **Indent using tabs** back on and set **Indent visual width** to 4.
+ */
+export function restoreDefaults(app: App): void {
+  app.vault.setConfig('useTab', true);
+  app.vault.setConfig('tabSize', DEFAULT_TAB_SIZE);
+  new Notice('Editor indent settings restored.');
+}
+
+/**
  * Puts Obsidian into the state the plugin actually affects: indenting with SPACES, at a width other
  * than Obsidian's hardcoded four.
  *
@@ -33,15 +44,4 @@ export function useTabIndent(app: App, tabSize: number): void {
   app.vault.setConfig('useTab', true);
   app.vault.setConfig('tabSize', tabSize);
   new Notice(`Indenting with tabs, drawn ${String(tabSize)} wide. The plugin changes nothing here.`);
-}
-
-/**
- * Restores Obsidian's defaults: tabs, four wide.
- *
- * Manual equivalent: turn **Indent using tabs** back on and set **Indent visual width** to 4.
- */
-export function restoreDefaults(app: App): void {
-  app.vault.setConfig('useTab', true);
-  app.vault.setConfig('tabSize', DEFAULT_TAB_SIZE);
-  new Notice('Editor indent settings restored.');
 }
