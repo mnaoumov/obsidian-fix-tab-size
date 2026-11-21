@@ -49,10 +49,11 @@ A copy of the vault ships with every release. You can access it via any of the f
 
 | Plugin | Features | How `Fix Tab Size` differs |
 | --- | --- | --- |
-| [`Indent with Spaces`](https://community.obsidian.md/plugins/two-space-indent) | Own Tab/Shift+Tab handlers and indent-width setting; table navigation | Same indentation goal; uses core Indent visual width; no extra setting/key handler |
+| [`Indent with Spaces`](https://community.obsidian.md/plugins/two-space-indent) | Own Tab/Shift+Tab handlers; own spaces-per-indent setting (1-8); table cell navigation through `Advanced Tables` | Same goal; follows the core Indent visual width instead of a setting of its own; keeps Obsidian's own Tab and Shift+Tab handling |
+| [`Restore Tab Key`](https://community.obsidian.md/plugins/restore-tab-key) | Tab inserts a tab character (or spaces) at the cursor; braces auto-indent; optional code-block-only mode | Different part of the same area: leaves what Tab does alone; changes only how many spaces one indent inserts |
 | [`Simple Tab Indent`](https://community.obsidian.md/plugins/simple-tab-indent) | Zero-width space plus tab; own display width; avoids code-block parsing | Alternative indentation: keeps spaces; changes their count per indent |
 
-Last searched for similar plugins on 2026-10-26.
+Last searched for similar plugins on 2026-11-21.
 
 ## Installation
 
