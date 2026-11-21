@@ -21,7 +21,8 @@ vi.mock('@mnaoumov/obsidian-lib/components/monkey-around-component', () => ({
 vi.mock('obsidian', () => ({
   Component: vi.fn(),
   MarkdownEditView: vi.fn(),
-  MarkdownView: vi.fn()
+  MarkdownView: vi.fn(),
+  Modal: vi.fn()
 }));
 
 vi.mock('@obsidian-typings/obsidian-public-latest/implementations', () => ({
